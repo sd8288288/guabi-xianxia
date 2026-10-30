@@ -64,19 +64,23 @@ header{position:relative;z-index:10;display:flex;align-items:center;gap:20px;pad
   text-shadow:0 2px 12px rgba(0,0,0,.5)}
 .brand .sub{font-size:11px;color:var(--muted);letter-spacing:3px;margin-left:2px}
 .res{text-align:right}
-.res-main{font-size:28px;font-weight:700;color:var(--gold-bright);line-height:1.15;font-variant-numeric:tabular-nums;
+.res-main{font-size:28px;font-weight:700;color:var(--gold-bright);line-height:1.15;
+  font-variant-numeric:tabular-nums;font-family:'SF Mono','Monaco','Menlo','Consolas',monospace;
   text-shadow:0 0 18px rgba(255,217,138,.35);transition:transform .1s}
 @keyframes numPop{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
 .res-main.numPop{animation:numPop .15s ease-out}
+/* 成就解锁动画 */
+@keyframes achFlash{0%{opacity:1}100%{opacity:0}}
+@keyframes achPop{0%{opacity:0;transform:scale(.7)}60%{transform:scale(1.05)}100%{opacity:1;transform:scale(1)}}
 .res-main label{font-size:12px;color:var(--muted);margin-left:6px;letter-spacing:2px;font-weight:400}
 .res-sub{display:flex;justify-content:flex-end;gap:8px;margin-top:3px}
 .mchip{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);
   background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:2px 11px;
-  font-variant-numeric:tabular-nums}
+  font-variant-numeric:tabular-nums;font-family:'SF Mono','Monaco','Menlo','Consolas',monospace}
 .mchip b{color:var(--text);font-weight:600}
 .jade-chip{display:inline-flex;align-items:center;gap:4px;margin-top:4px;font-size:12px;color:#f0b5a8;
   background:rgba(192,86,74,.1);border:1px solid rgba(192,86,74,.3);border-radius:999px;padding:2px 11px;
-  font-variant-numeric:tabular-nums}
+  font-variant-numeric:tabular-nums;font-family:'SF Mono','Monaco','Menlo','Consolas',monospace}
 .jade-chip b{font-size:13px}
 .tools{display:flex;gap:8px}
 .tools button{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);cursor:pointer;
@@ -110,7 +114,11 @@ main{position:relative;z-index:5;display:flex;gap:18px;height:calc(100vh - 69px)
   border:1px solid rgba(230,194,110,.35);animation:halopulse 3s ease-in-out infinite;pointer-events:none}
 @keyframes halopulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.03)}}
 #dantian img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;
-  filter:contrast(1.04) saturate(1.08)}
+  filter:contrast(1.04) saturate(1.08);transition:filter .3s}
+/* 头像表情状态 */
+#dantian.excited img{filter:contrast(1.1) saturate(1.3) brightness(1.1)}
+#dantian.crit img{filter:contrast(1.2) saturate(1.4) brightness(1.2) hue-rotate(-10deg)}
+#dantian.sleeping img{filter:contrast(0.9) saturate(0.7) brightness(0.85)}
 #dantian:hover{transform:scale(1.04);box-shadow:0 0 62px rgba(230,194,110,.32),0 6px 24px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.5)}
 /* 连击光环 */
 #dantian.glow1{box-shadow:0 0 50px rgba(230,194,110,.5),0 0 80px rgba(230,194,110,.3),0 6px 24px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.5)}
@@ -132,7 +140,8 @@ main{position:relative;z-index:5;display:flex;gap:18px;height:calc(100vh - 69px)
   border:1px solid rgba(230,194,110,.4);border-radius:4px;
   clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.08);text-shadow:0 0 10px rgba(255,217,138,.35)}
-.click-stats{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.click-stats{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;
+  font-family:'SF Mono','Monaco','Menlo','Consolas',monospace}
 .click-stats b{color:var(--gold-bright);font-size:16px}
 .quote{font-size:13px;color:#988f79;text-align:center;line-height:1.9;max-width:270px;min-height:3.4em;
   transition:opacity .4s;padding:9px 14px;border:1px dashed rgba(230,194,110,.22);border-radius:10px;
@@ -151,8 +160,8 @@ main{position:relative;z-index:5;display:flex;gap:18px;height:calc(100vh - 69px)
   background:linear-gradient(90deg,transparent,var(--gold),transparent);box-shadow:0 0 8px rgba(230,194,110,.6)}
 .tab.dot::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold-bright);
   margin-right:6px;box-shadow:0 0 6px var(--gold-bright);vertical-align:2px}
-.panes{flex:1;min-height:0;position:relative}.pane{display:none;height:100%;overflow-y:auto;padding:14px 18px 26px}
-.pane.active{display:block}
+.panes{flex:1;min-height:0;position:relative}.pane{display:none;height:100%;overflow-y:auto;padding:14px 18px 26px;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s}
+.pane.active{display:block;opacity:1;transform:translateY(0)}
 .pane-title{display:flex;align-items:center;gap:8px;color:var(--gold);letter-spacing:3px;font-size:15px;margin:8px 0 12px}
 .pane-title::before{content:'';width:3px;height:14px;border-radius:2px;
   background:linear-gradient(180deg,var(--gold-bright),rgba(230,194,110,.2))}
@@ -260,9 +269,12 @@ main{position:relative;z-index:5;display:flex;gap:18px;height:calc(100vh - 69px)
 .pv-stats span{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.07);border-radius:999px;padding:5px 14px}
 .pv-stats b{color:var(--gold-bright);font-size:15px;margin-left:4px;font-variant-numeric:tabular-nums}
 .pv-bar{height:14px;border-radius:8px;background:rgba(0,0,0,.4);border:1px solid var(--line);overflow:hidden;
-  box-shadow:inset 0 2px 6px rgba(0,0,0,.5)}
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.5);position:relative}
+.pv-bar::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 19px,rgba(255,255,255,.08) 19px,rgba(255,255,255,.08) 20px);pointer-events:none;z-index:1}
 #pvBar{height:100%;width:0;background:linear-gradient(90deg,#8f3b31,#c0564a,#e08a5e);transition:width .4s;
-  box-shadow:0 0 12px rgba(224,138,94,.5)}
+  box-shadow:0 0 12px rgba(224,138,94,.5);position:relative}
+#pvBar::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:barFlow 2s linear infinite}
+@keyframes barFlow{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 .pv-text{font-size:12px;color:var(--muted);margin:10px 0 18px;font-variant-numeric:tabular-nums}
 @keyframes redpulse{0%,100%{box-shadow:0 0 0 0 rgba(224,138,94,.45)}50%{box-shadow:0 0 0 9px rgba(224,138,94,0)}}
 .btn-danger.ready{animation:redpulse 1.6s ease-out infinite;border-color:rgba(232,154,138,.8)}
@@ -1687,7 +1699,7 @@ function updateCombo(){
   const avatar=document.getElementById('dantian');
   if(combo<5){
     b.classList.remove('show','hot1','hot2','hot3');
-    avatar.classList.remove('glow1','glow2','glow3');
+    avatar.classList.remove('glow1','glow2','glow3','excited');
     return;
   }
   document.getElementById('comboN').textContent='×'+comboMultVal().toFixed(2);
@@ -1700,6 +1712,7 @@ function updateCombo(){
   avatar.classList.toggle('glow1',combo>=10&&combo<20);
   avatar.classList.toggle('glow2',combo>=20&&combo<30);
   avatar.classList.toggle('glow3',combo>=30);
+  avatar.classList.toggle('excited',combo>=10);
 }
 function playCritVoice(){
   if(state.muted)return;
@@ -1708,6 +1721,9 @@ function playCritVoice(){
 function critFX(x,y,g){
   playCritVoice();   /* 先出声再画特效：后面的 DOM 操作和 70 个粒子不该排在音频前面 */
   document.body.classList.remove('shaking');void document.body.offsetWidth;document.body.classList.add('shaking');
+  const avatar=document.getElementById('dantian');
+  avatar.classList.add('crit');
+  setTimeout(()=>avatar.classList.remove('crit'),500);
   const fx=document.getElementById('critfx');
   fx.style.setProperty('--cx',x+'px');fx.style.setProperty('--cy',y+'px');
   fx.classList.remove('go');void fx.offsetWidth;fx.classList.add('go');
@@ -2094,9 +2110,27 @@ function checkAchs(){
       state.ach[a.id]=1;changed=true;
       if(achRefs[a.id])achRefs[a.id].classList.add('earned');
       toast('成就达成 · '+a.name+'（全局产量 +1%）');Sound.ach();
+      achUnlockFX(a);
     }
   });
   if(changed)set('achCount','已达成 '+achCount()+' / '+ACHS.length);
+}
+/* 成就解锁特效 */
+function achUnlockFX(a){
+  /* 全屏金色闪光 */
+  const flash=document.createElement('div');
+  flash.style.cssText='position:fixed;inset:0;z-index:9999;background:radial-gradient(circle,rgba(255,217,138,.4),rgba(255,217,138,.1));pointer-events:none;animation:achFlash .6s ease-out forwards';
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(),700);
+  /* 中心粒子爆发 */
+  spawnBurst(innerWidth/2,innerHeight/2,50);
+  /* 弹窗从中心放大 */
+  showModal('<div class="pv-icon flv" style="color:#ffd98a;border-color:rgba(255,217,138,.7);background:rgba(255,217,138,.2);animation:achPop .4s ease-out">'+a.ch+'</div>'+
+    '<h3 class="flv" style="color:#ffd98a;animation:achPop .4s ease-out .1s both">成就达成</h3>'+
+    '<p style="font-size:16px;color:var(--text);animation:achPop .4s ease-out .2s both"><b>'+a.name+'</b></p>'+
+    '<p style="color:var(--muted);animation:achPop .4s ease-out .3s both">'+a.desc+'</p>'+
+    '<p class="gold" style="animation:achPop .4s ease-out .4s both">全局产量 +1%</p>'+
+    '<div class="btnrow" style="animation:achPop .4s ease-out .5s both"><button class="btn" data-close>太棒了</button></div>',{sticky:true});
 }
 
 /* ============ UI：明细 / 过年 / 统计 ============ */
@@ -2278,6 +2312,9 @@ function showIntro(){
     '<div class="btnrow"><button class="btn" data-close>开始搬砖</button></div>',{sticky:true});
 }
 function showOffline(o){
+  const avatar=document.getElementById('dantian');
+  avatar.classList.add('sleeping');
+  setTimeout(()=>avatar.classList.remove('sleeping'),3000);
   const capH=Math.round(o.cap/3600);
   showModal('<div class="pv-icon flv" style="color:#cbd5ec;border-color:rgba(140,160,200,.4);background:rgba(140,160,200,.1)">挂</div>'+
     '<h3 class="flv">挂机收益</h3>'+
@@ -2341,9 +2378,10 @@ function bindStatic(){
   $$('.tab').forEach(t=>t.addEventListener('click',()=>{
     $$('.tab').forEach(x=>x.classList.remove('active'));
     t.classList.add('active');
-    $$('.pane').forEach(p=>p.classList.remove('active'));
+    $$('.pane').forEach(p=>{p.classList.remove('active');p.style.display='none';});
     const pane=$('#pane-'+t.dataset.tab);
-    pane.classList.add('active');
+    pane.style.display='block';
+    requestAnimationFrame(()=>{requestAnimationFrame(()=>{pane.classList.add('active');});});
     pane.scrollTop=0;
     if(t.scrollIntoView)t.scrollIntoView({block:'nearest',inline:'center'});
   }));
