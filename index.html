@@ -884,6 +884,11 @@ const BUILDINGS=[
   {id:'script', name:'脚本外包',  ch:'本', base:2.5e14, cps:8e8,    blurb:'外包给隔壁大学生，一夜写好。'},
   {id:'server', name:'私服一条龙',ch:'服', base:3.8e15, cps:6e9,    blurb:'开服三天，关服跑路，装备全没收。'},
   {id:'ipo',    name:'挂牌上市',  ch:'市', base:5.7e16, cps:4.5e10, blurb:'敲钟那天，全村的挂逼都来站台。'},
+  {id:'metaverse',name:'元宇宙帝国',ch:'域', base:8e17,  cps:3.5e11, blurb:'虚拟世界，真实收益，韭菜跨次元。'},
+  {id:'ai',     name:'AI 搬砖集群',ch:'智', base:1.2e19, cps:2.5e12, blurb:'AI 替你 24 小时搬砖，连电费都省了。'},
+  {id:'quantum',name:'量子计算机', ch:'量', base:2e20,  cps:1.8e13, blurb:'量子叠加态，同时搬所有服务器的砖。'},
+  {id:'dyson',  name:'戴森球',     ch:'星', base:5e21,  cps:1.2e14, blurb:'包裹恒星的能量，全用来挂机。'},
+  {id:'universe',name:'宇宙银行',  ch:'宙', base:1e23,  cps:8e14,  blurb:'全宇宙的金币，都是你的。'},
 ];
 
 /* ============ 数据：神装 ============ */
@@ -929,6 +934,23 @@ up('o1','断线重连','重','离线效率 +15%',2e6,'offline',0.15,{req:s=>s.as
 up('o2','云服务器托管','托','离线效率 +20%',5e9,'offline',0.20,{req:s=>s.ascends>=3});
 up('g8','网吧包夜卡','卡','全局产量 +60%',1e16,'gMult',0.60,{req:s=>s.lifetimeAll>=1e14});
 up('c8','祖传双击','双','点击收益 ×3',5e13,'clickMult',3,{req:s=>s.clicks>=15000});
+/* —— 新增神装 —— */
+up('c9','电竞级手速','速','点击收益 ×4',2e15,'clickMult',4,{req:s=>s.clicks>=30000});
+up('c10','人键合一','键','点击额外获得每秒产量的 10%',5e14,'clickCps',0.10,{req:s=>s.clicks>=20000});
+up('g9','挂逼之道','道','全局产量 +80%',5e17,'gMult',0.80,{req:s=>s.lifetimeAll>=5e15});
+up('g10','天道酬勤','天','全局产量 +100%',1e19,'gMult',1.00,{req:s=>s.lifetimeAll>=1e17});
+up('x6','天选之人','选','暴击率 +15%',8e12,'critChance',0.15,{req:s=>s.ups['x3']});
+up('x7','橙装之神','神','暴击倍率 ×3',3e13,'critMul',3,{req:s=>s.ups['x5']});
+up('o3','量子挂机','量','离线效率 +25%',8e13,'offline',0.25,{req:s=>s.ups['o2']});
+up('o4','平行宇宙','宇','离线效率 +30%',1e16,'offline',0.30,{req:s=>s.ups['o3']});
+up('e1','事件大师','事','恶搞事件增益 +30%',5e10,'evtMult',0.30,{req:s=>s.events>=20});
+up('e2','灵感迸发','感','事件触发频率 +40%',2e12,'evtFreq',0.40,{req:s=>s.ups['e1']});
+up('j1','玉简感悟','玉','飞升玉加成 +20%',5e11,'jadeMult',0.20,{req:s=>s.ascends>=2});
+up('j2','道心通明','心','飞升玉加成 +35%',1e14,'jadeMult',0.35,{req:s=>s.ups['j1']});
+up('co1','连击之心','连','连击倍率上限 +2',3e9,'comboMax',2,{req:s=>s.clicks>=5000});
+up('co2','连击之魂','魂','连击倍率上限 +3',1e12,'comboMax',3,{req:s=>s.ups['co1']});
+up('b1','封号护体','封','封号损失 -20%',8e10,'banReduce',0.20,{req:s=>s.events>=10});
+up('a5','全自动工厂','厂','每秒自动点击 80 次',1e16,'autoClick',80,{req:s=>s.ups['a4']});
 
 /* ============ 数据：成就 ============ */
 const ACHS=[];
@@ -1027,7 +1049,16 @@ const has=id=>!!state.ups[id];
 function totalBuildings(){return BUILDINGS.reduce((a,b)=>a+state.b[b.id],0);}
 function achCount(){return Object.keys(state.ach).length;}
 function gongfaMult(){let m=1;for(const u of UPS)if(u.type==='gMult'&&has(u.id))m*=(1+u.v);return m;}
-function globalMult(){return gongfaMult()*(1+state.jade*0.02)*(1+achCount()*0.01)*talentProd('gMult')*(1+npcSum('gMult'));}
+function globalMult(){
+  let m=gongfaMult();
+  m*=(1+state.jade*0.02*(1+upSum('jadeMult')*(1+perkLevel('jade')*0.20)));
+  m*=(1+achCount()*0.01*(1+npcSum('achMult')));
+  m*=talentProd('gMult');
+  m*=(1+npcSum('gMult'));
+  m*=(1+perkLevel('luck')*0.25);
+  m*=(1+upSum('evtMult')*(1+npcSum('evtMult')));
+  return m;
+}
 function buildingMult(i){let m=1;for(const u of UPS)if(u.type==='bMult'&&u.bIdx===i&&has(u.id))m*=u.v;return m;}
 function cps(){
   let s=0;
@@ -1044,10 +1075,11 @@ function clickPower(){
 /* 资料片：按类型汇总神装（加法 / 乘法） */
 function upSum(type){let v=0;for(const u of UPS)if(u.type===type&&has(u.id))v+=u.v;return v;}
 function upProd(type){let v=1;for(const u of UPS)if(u.type===type&&has(u.id))v*=u.v;return v;}
-function bCost(b,owned){return b.base*Math.pow(R,owned);}
-function bulkCost(b,owned,n){return b.base*Math.pow(R,owned)*(Math.pow(R,n)-1)/(R-1);}
+function bCost(b,owned){return b.base*Math.pow(R,owned)*(1-npcSum('bDiscount'));}
+function bulkCost(b,owned,n){return b.base*Math.pow(R,owned)*(Math.pow(R,n)-1)/(R-1)*(1-npcSum('bDiscount'));}
 function maxAfford(b,owned,stones){
-  const g0=b.base*Math.pow(R,owned);
+  const disc=1-npcSum('bDiscount');
+  const g0=b.base*Math.pow(R,owned)*disc;
   return Math.max(0,Math.floor(Math.log(1+stones*(R-1)/g0)/Math.log(R)));
 }
 function jadeGain(){return Math.floor(Math.pow(state.runLifetime/1e12,0.5));}
@@ -1065,6 +1097,13 @@ const PERKS=[
   {id:'dream',  ch:'梦', name:'梦游搬砖',   desc:'离线效率 +10%',     base:6,  growth:2.5, max:4},
   {id:'sleep',  ch:'眠', name:'闭关延长',   desc:'离线上限 +12 小时', base:4,  growth:3,   max:2},
   {id:'luck',   ch:'运', name:'时来运转',   desc:'全局产量 +25%',     base:15, growth:2.2, max:4},
+  /* —— 新增红包特权 —— */
+  {id:'combo',  ch:'击', name:'连击心得',   desc:'连击倍率上限 +1',   base:12, growth:2.5, max:3},
+  {id:'evtGain',ch:'事', name:'事件增益',   desc:'恶搞事件金币 +30%',  base:10, growth:2.5, max:4},
+  {id:'evtFreq',ch:'频', name:'灵感迸发',   desc:'事件触发频率 +25%',  base:8,  growth:2.5, max:3},
+  {id:'jade',   ch:'玉', name:'玉简感悟',   desc:'飞升玉效果 +20%',   base:20, growth:3,   max:3},
+  {id:'banShield',ch:'盾',name:'封号护体',  desc:'封号损失 -20%',     base:12, growth:2.5, max:3},
+  {id:'dailyBonus',ch:'常',name:'日常加倍', desc:'日常任务奖励 +25%',  base:10, growth:2.5, max:4},
 ];
 function perkLevel(id){return state.perks[id]||0;}
 function perkCost(p){return Math.ceil(p.base*Math.pow(p.growth,perkLevel(p.id)));}
@@ -1214,7 +1253,8 @@ function eventMult(){
 function maybeEvent(){
   const now=Date.now();
   if(document.hidden||now<nextEventAt)return;
-  nextEventAt=now+90000+Math.random()*90000;
+  const freq=1+upSum('evtFreq')*(1+npcSum('evtFreq'))+perkLevel('evtFreq')*0.25;
+  nextEventAt=now+(90000+Math.random()*90000)/freq;
   const total=EVENTS.reduce((a,e)=>a+e.w,0);
   let r=Math.random()*total,pick=EVENTS[0];
   for(const e of EVENTS){r-=e.w;if(r<=0){pick=e;break;}}
@@ -1229,11 +1269,11 @@ function fireEvent(e){
     activeEvents.push({id:e.id,ch:e.ch,name:e.name,mult:e.mult,until:now+dur*1000});
     if(e.mult<1)cls='bad';
   }else if(e.type==='lose'){
-    const loss=state.stones*0.05*(1-npcSum('banReduce'));state.stones-=loss;
+    const loss=state.stones*0.05*(1-npcSum('banReduce'))*(1-perkLevel('banShield')*0.20)*(1-upSum('banReduce'));state.stones-=loss;
     line='损失 '+fmt(loss)+' 金币';cls='bad';
     recordDark('banned');
   }else if(e.type==='gain'){
-    const g=Math.max(200,cps()*45);state.stones+=g;state.runLifetime+=g;state.lifetimeAll+=g;
+    const g=Math.max(200,cps()*45)*(1+perkLevel('evtGain')*0.30);state.stones+=g;state.runLifetime+=g;state.lifetimeAll+=g;
     line='+ '+fmt(g)+' 金币';
   }
   /* NPC 好感度变化 */
@@ -1312,7 +1352,7 @@ function claimDaily(id){
   const t=DAILY_POOL.find(x=>x.id===id);if(!t)return;
   if(state.daily.done[id]||dailyProg(t)<t.goal){Sound.deny();return;}
   state.daily.done[id]=1;state.dailyDone=(state.dailyDone||0)+1;
-  const g=Math.max(2000,cps()*240);
+  const g=Math.max(2000,cps()*240)*(1+perkLevel('dailyBonus')*0.25);
   state.stones+=g;state.runLifetime+=g;state.lifetimeAll+=g;
   Sound.buy();toast('日常完成 · '+t.name+'（+'+fmt(g)+' 金币）');
   if(state.daily.picked.every(p=>state.daily.done[p])&&!state.daily.bonus){
@@ -1504,7 +1544,7 @@ function floatNum(x,y,txt){
 /* ============ 连击 / 暴击 ============ */
 const CRIT_LINES=['出橙了！！！','橙弓+1，脚不沾地！','一百块！整整一百块！','天降挂逼神器！','金团爆炸，全服轰动！','这波血赚，老板直呼内行！','系统公告：B桶出货了！'];
 let combo=0,lastClickAt=0;
-function comboMax(){return 40+talentSum('comboMax');}
+function comboMax(){return 40+talentSum('comboMax')+upSum('comboMax')+perkLevel('combo');}
 function comboMultVal(){return 1+Math.min(Math.max(combo-1,0),comboMax())*0.05;}
 function updateCombo(){
   const b=document.getElementById('comboBadge');
@@ -1698,9 +1738,10 @@ function rebuildUpgrades(){
   if(!vis.length){const e=document.createElement('div');e.className='empty';e.textContent='暂时没有可升级的神装，继续搬砖吧。';list.appendChild(e);}
   vis.forEach(u=>{
     const card=document.createElement('div');card.className='ucard';
+    const disc=1-npcSum('upDiscount');
     card.innerHTML='<div class="bicon flv">'+u.ch+'</div>'+
       '<div class="binfo"><div class="uname">'+u.name+'</div><div class="udesc">'+u.desc+'</div></div>'+
-      '<div class="ucost">'+fmt(u.cost)+' 金币</div>';
+      '<div class="ucost">'+fmt(Math.ceil(u.cost*disc))+' 金币</div>';
     card.addEventListener('click',()=>buyUpgrade(u.id));
     list.appendChild(card);
     upRefs[u.id]={u:u,card:card};
@@ -1712,20 +1753,25 @@ function updateUpgrades(){
   const sig=visibleUps().map(u=>u.id).join('|');
   if(sig!==upSig){rebuildUpgrades();return;}
   for(const id in upRefs){
-    const can=state.stones>=upRefs[id].u.cost;
+    const disc=1-npcSum('upDiscount');
+    const cost=Math.ceil(upRefs[id].u.cost*disc);
+    const can=state.stones>=cost;
     upRefs[id].card.classList.toggle('can',can);
     upRefs[id].card.classList.toggle('cannot',!can);
   }
   updateGfDot();
 }
 function updateGfDot(){
-  let c=0;for(const id in upRefs)if(state.stones>=upRefs[id].u.cost)c++;
+  const disc=1-npcSum('upDiscount');
+  let c=0;for(const id in upRefs)if(state.stones>=Math.ceil(upRefs[id].u.cost*disc))c++;
   $('#tabGf').classList.toggle('dot',c>0);
 }
 function buyUpgrade(id){
   const u=UPS.find(x=>x.id===id);if(!u)return;
-  if(state.ups[id]||state.stones<u.cost){Sound.deny();return;}
-  state.stones-=u.cost;state.ups[id]=1;state.upBought=(state.upBought||0)+1;
+  if(state.ups[id]){Sound.deny();return;}
+  const cost=Math.ceil(u.cost*(1-npcSum('upDiscount')));
+  if(state.stones<cost){Sound.deny();return;}
+  state.stones-=cost;state.ups[id]=1;state.upBought=(state.upBought||0)+1;
   Sound.buy();rebuildUpgrades();updateCounters();updateDetail();
 }
 
