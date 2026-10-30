@@ -65,7 +65,9 @@ header{position:relative;z-index:10;display:flex;align-items:center;gap:20px;pad
 .brand .sub{font-size:11px;color:var(--muted);letter-spacing:3px;margin-left:2px}
 .res{text-align:right}
 .res-main{font-size:28px;font-weight:700;color:var(--gold-bright);line-height:1.15;font-variant-numeric:tabular-nums;
-  text-shadow:0 0 18px rgba(255,217,138,.35)}
+  text-shadow:0 0 18px rgba(255,217,138,.35);transition:transform .1s}
+@keyframes numPop{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+.res-main.numPop{animation:numPop .15s ease-out}
 .res-main label{font-size:12px;color:var(--muted);margin-left:6px;letter-spacing:2px;font-weight:400}
 .res-sub{display:flex;justify-content:flex-end;gap:8px;margin-top:3px}
 .mchip{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);
@@ -110,6 +112,10 @@ main{position:relative;z-index:5;display:flex;gap:18px;height:calc(100vh - 69px)
 #dantian img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;
   filter:contrast(1.04) saturate(1.08)}
 #dantian:hover{transform:scale(1.04);box-shadow:0 0 62px rgba(230,194,110,.32),0 6px 24px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.5)}
+/* 连击光环 */
+#dantian.glow1{box-shadow:0 0 50px rgba(230,194,110,.5),0 0 80px rgba(230,194,110,.3),0 6px 24px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.5)}
+#dantian.glow2{box-shadow:0 0 60px rgba(255,180,80,.6),0 0 100px rgba(255,180,80,.4),0 6px 24px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.5)}
+#dantian.glow3{box-shadow:0 0 80px rgba(255,100,60,.7),0 0 120px rgba(255,100,60,.5),0 0 160px rgba(255,100,60,.3),0 6px 24px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.5)}
 /* 按下反馈只缩放里面的头像，按钮本身的点击区域保持 100%，连点不会因为缩小而漏点 */
 #dantian:active{transform:none}
 #dantian img{transition:transform .08s}
@@ -260,6 +266,28 @@ main{position:relative;z-index:5;display:flex;gap:18px;height:calc(100vh - 69px)
 .pv-text{font-size:12px;color:var(--muted);margin:10px 0 18px;font-variant-numeric:tabular-nums}
 @keyframes redpulse{0%,100%{box-shadow:0 0 0 0 rgba(224,138,94,.45)}50%{box-shadow:0 0 0 9px rgba(224,138,94,0)}}
 .btn-danger.ready{animation:redpulse 1.6s ease-out infinite;border-color:rgba(232,154,138,.8)}
+
+/* ============ 飞升悟道树 ============ */
+.pt-node{display:flex;align-items:center;gap:12px;padding:12px 16px;margin:8px 0;
+  border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(0,0,0,.3);
+  transition:all .2s;cursor:default;text-align:left}
+.pt-node.unlocked{border-color:rgba(255,217,138,.5);background:rgba(255,217,138,.08);cursor:default}
+.pt-node.available{border-color:rgba(230,194,110,.4);background:rgba(230,194,110,.05);cursor:pointer}
+.pt-node.available:hover{background:rgba(230,194,110,.12);transform:translateY(-1px)}
+.pt-node.locked{opacity:.5}
+.pt-ch{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:20px;flex-shrink:0;
+  border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.3)}
+.pt-node.unlocked .pt-ch{color:var(--gold-bright);border-color:rgba(255,217,138,.5);background:rgba(255,217,138,.15)}
+.pt-node.available .pt-ch{color:var(--gold);border-color:rgba(230,194,110,.4);background:rgba(230,194,110,.1)}
+.pt-info{flex:1;min-width:0}
+.pt-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.pt-desc{font-size:12px;color:var(--muted);line-height:1.4}
+.pt-req{font-size:11px;color:var(--muted);margin-top:4px}
+.pt-node.available .pt-req{color:var(--gold)}
+.pt-status{font-size:11px;padding:3px 8px;border-radius:6px;flex-shrink:0}
+.pt-node.unlocked .pt-status{background:rgba(255,217,138,.2);color:var(--gold-bright)}
+.pt-node.available .pt-status{background:rgba(230,194,110,.2);color:var(--gold)}
+.pt-node.locked .pt-status{background:rgba(255,255,255,.05);color:var(--muted)}
 
 /* ============ 明细与统计 ============ */
 .mrow{display:flex;justify-content:space-between;gap:12px;padding:9px 6px;border-radius:8px;
@@ -772,6 +800,12 @@ body.has-auto #autoChip{display:inline-flex}
           <div id="pvText" class="pv-text">…</div>
           <button id="pvBtn" class="btn-danger" disabled>回村过年</button>
         </div>
+        <div class="pv-wrap" style="margin-top:18px">
+          <h3 class="flv">飞升悟道树</h3>
+          <p class="pv-desc">每次回村过年积累修为，达到要求可领悟永久节点。<br>
+            领悟后跨局生效，越回家越强。</p>
+          <div id="prestigeTreeList"></div>
+        </div>
       </div>
       <div class="pane" id="pane-shangdian">
         <div class="pane-hint">花红包买永久特权，飞升也不清零；留着则每封 +2% 全局产量——花还是攒，自己权衡。<b id="perkJade"></b></div>
@@ -829,7 +863,7 @@ body.has-auto #autoChip{display:inline-flex}
 window.__errs=[];
 window.addEventListener('error',e=>window.__errs.push(String(e.message)));
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-const set=(id,v)=>{const e=document.getElementById(id); if(e)e.textContent=v;};
+const set=(id,v)=>{const e=document.getElementById(id); if(e){if(e.textContent!==String(v)){e.textContent=v;e.classList.remove('numPop');void e.offsetWidth;e.classList.add('numPop');}}};
 const UNITS=[[1e88,'大数'],[1e80,'无量'],[1e72,'不可思议'],[1e64,'那由他'],[1e56,'阿僧祇'],[1e48,'恒河沙'],[1e44,'极'],[1e40,'载'],[1e36,'正'],[1e32,'涧'],[1e28,'穰'],[1e24,'秭'],[1e20,'垓'],[1e16,'京'],[1e12,'兆'],[1e8,'亿'],[1e4,'万']];
 function _f(n){
   if(!isFinite(n))return '∞';
@@ -990,6 +1024,38 @@ const TRIBULATIONS=[
 ];
 let tribActive=null,tribClicks=0,tribTimer=null,tribTriggered=new Set();
 
+/* ============ 飞升解锁树（跨局永久） ============ */
+const PRESTIGE_TREE=[
+  {id:'pt1',name:'前世记忆',ch:'忆',desc:'飞升后保留上局 5% CPS（替代 1%）',req:1,effect:'legacyMult',val:0.05},
+  {id:'pt2',name:'家传手艺',ch:'艺',desc:'点击收益永久 +50%',req:2,effect:'clickMult',val:0.50},
+  {id:'pt3',name:'老马识途',ch:'途',desc:'离线效率永久 +20%',req:3,effect:'offline',val:0.20},
+  {id:'pt4',name:'贵人相助',ch:'贵',desc:'NPC 好感度获取 +30%',req:4,effect:'npcFavMult',val:0.30},
+  {id:'pt5',name:'天道酬勤',ch:'勤',desc:'全局产量永久 +25%',req:5,effect:'gMult',val:0.25},
+  {id:'pt6',name:'财运亨通',ch:'财',desc:'暴击率永久 +10%',req:7,effect:'critChance',val:0.10},
+  {id:'pt7',name:'福泽绵长',ch:'福',desc:'红包特权效果 +20%',req:10,effect:'perkMult',val:0.20},
+  {id:'pt8',name:'超凡入圣',ch:'圣',desc:'飞升玉获取 +50%',req:15,effect:'jadeMult',val:0.50},
+];
+function prestigeNodeUnlocked(id){return !!state.prestigeNodes[id];}
+function unlockPrestigeNode(id){
+  const node=PRESTIGE_TREE.find(n=>n.id===id);if(!node)return false;
+  if(state.ascends<node.req)return false;
+  if(state.prestigeNodes[id])return false;
+  state.prestigeNodes[id]=1;
+  recordDark('milestone',{n:'解锁飞升节点：'+node.name});
+  Sound.ach();saveGame();rebuildAll();
+  showModal('<div class="pv-icon flv" style="color:#ffd98a;border-color:rgba(255,217,138,.6);background:rgba(255,217,138,.15)">悟</div>'+
+    '<h3 class="flv">领悟：'+node.name+'</h3>'+
+    '<p>'+node.desc+'</p>'+
+    '<p class="gold">此效果跨局永久生效</p>'+
+    '<div class="btnrow"><button class="btn" data-close>继续修行</button></div>',{sticky:true});
+  return true;
+}
+function prestigeSum(effect){
+  let v=0;
+  PRESTIGE_TREE.forEach(n=>{if(n.effect===effect&&prestigeNodeUnlocked(n.id))v+=n.val;});
+  return v;
+}
+
 /* ============ 人脉 NPC ============ */
 const NPCS=[
   {id:'boss',  ch:'板',name:'网吧老板',  desc:'包夜八小时，熟客打折。',maxFav:100,
@@ -1001,6 +1067,41 @@ const NPCS=[
   {id:'admin', ch:'管',name:'网管小弟',  desc:'拉网线、修主机、偶尔封号。',maxFav:100,
    perks:[{fav:30,desc:'封号损失减半',type:'banReduce',val:0.5},{fav:70,desc:'脚本点击 +20%',type:'autoMult',val:0.2},{fav:100,desc:'网管罩着，成就加成 +10%',type:'achMult',val:0.1}]},
 ];
+
+/* ============ NPC 互动事件链 ============ */
+const NPC_EVENTS=[
+  {npcId:'boss',fav:20,ch:'板',name:'熟客折扣',desc:'"常来啊，给你打个折。"',reward:'bDiscount',val:0.1},
+  {npcId:'boss',fav:50,ch:'板',name:'包夜特权',desc:'"今晚包夜算我的。"',reward:'gMult',val:0.05},
+  {npcId:'boss',fav:80,ch:'板',name:'老板罩你',desc:'"有人找茬报我名字。"',reward:'banReduce',val:0.3},
+  {npcId:'noodle',fav:20,ch:'面',name:'多加个蛋',desc:'"今天给你加个蛋。"',reward:'clickMult',val:0.05},
+  {npcId:'noodle',fav:50,ch:'面',name:'秘方传授',desc:'"我这挂逼面配方给你。"',reward:'gMult',val:0.05},
+  {npcId:'noodle',fav:80,ch:'面',name:'免费加餐',desc:'"以后来吃都不要钱。"',reward:'upDiscount',val:0.1},
+  {npcId:'bro',fav:20,ch:'哥',name:'红牛分享',desc:'"来，提红牛，一起肝。"',reward:'evtMult',val:0.1},
+  {npcId:'bro',fav:50,ch:'哥',name:'网线共享',desc:'"我这边网速快，用我的。"',reward:'autoMult',val:0.1},
+  {npcId:'bro',fav:80,ch:'哥',name:'生死兄弟',desc:'"你的事就是我的事。"',reward:'gMult',val:0.08},
+  {npcId:'admin',fav:20,ch:'管',name:'网管关照',desc:'"有事叫我。"',reward:'banReduce',val:0.2},
+  {npcId:'admin',fav:50,ch:'管',name:'后门权限',desc:'"给你开个绿色通道。"',reward:'autoMult',val:0.15},
+  {npcId:'admin',fav:80,ch:'管',name:'铁哥们',desc:'"封号？不存在的。"',reward:'banReduce',val:0.3},
+];
+let npcEventsDone={};
+function checkNpcEvents(){
+  if(!state.np)return;
+  NPC_EVENTS.forEach(ev=>{
+    const key=ev.npcId+'_'+ev.fav;
+    if(npcEventsDone[key])return;
+    if((state.np[ev.npcId]||0)>=ev.fav){
+      npcEventsDone[key]=1;
+      state.npcEventsDone[key]=1;
+      recordDark('milestone',{n:'NPC事件：'+ev.name});
+      Sound.ach();
+      showModal('<div class="pv-icon flv" style="color:#9fd8c0;border-color:rgba(159,216,192,.6);background:rgba(159,216,192,.15)">'+ev.ch+'</div>'+
+        '<h3 class="flv" style="color:#9fd8c0">'+ev.name+'</h3>'+
+        '<p>'+ev.desc+'</p>'+
+        '<p class="gold">好感度奖励已生效</p>'+
+        '<div class="btnrow"><button class="btn" data-close>继续</button></div>',{sticky:true});
+    }
+  });
+}
 
 /* ============ 黑历史图鉴 ============ */
 const DARK_TEMPLATES=[
@@ -1041,7 +1142,8 @@ const TALENTS=[
 const SAVE_KEY='idle-guabi-save-v1', R=1.15;
 function freshState(){return{stones:0,runLifetime:0,lifetimeAll:0,clicks:0,clickEarned:0,b:{},ups:{},ach:{},perks:{},talents:{},
   jade:0,ascends:0,talentPoints:0,playtime:0,lastSave:Date.now(),muted:false,introSeen:false,buyMode:'1',startAt:Date.now(),
-  mCrits:0,autoClicks:0,bBought:0,upBought:0,events:0,dailyDone:0,daily:null,np:{},darkHistory:[],tribDone:{},_v:2};}
+  mCrits:0,autoClicks:0,bBought:0,upBought:0,events:0,dailyDone:0,daily:null,np:{},darkHistory:[],tribDone:{},
+  legacy:{bestCps:0,totalCps:0},prestigeNodes:{},npcEventsDone:{},_v:2};}
 let state=freshState();
 BUILDINGS.forEach(b=>state.b[b.id]=0);
 
@@ -1051,12 +1153,17 @@ function achCount(){return Object.keys(state.ach).length;}
 function gongfaMult(){let m=1;for(const u of UPS)if(u.type==='gMult'&&has(u.id))m*=(1+u.v);return m;}
 function globalMult(){
   let m=gongfaMult();
-  m*=(1+state.jade*0.02*(1+upSum('jadeMult')*(1+perkLevel('jade')*0.20)));
+  m*=(1+state.jade*0.02*(1+upSum('jadeMult')*(1+perkLevel('jade')*0.20))*(1+prestigeSum('jadeMult')));
   m*=(1+achCount()*0.01*(1+npcSum('achMult')));
   m*=talentProd('gMult');
   m*=(1+npcSum('gMult'));
   m*=(1+perkLevel('luck')*0.25);
   m*=(1+upSum('evtMult')*(1+npcSum('evtMult')));
+  /* 飞升继承：前世最高 CPS 的 1%（或 5% 如果解锁了前世记忆）作为永久加成 */
+  const legacyRate=0.01+prestigeSum('legacyMult');
+  if(state.legacy&&state.legacy.bestCps>0)m*=(1+state.legacy.bestCps*legacyRate);
+  /* 飞升树：天道酬勤 */
+  m*=(1+prestigeSum('gMult'));
   return m;
 }
 function buildingMult(i){let m=1;for(const u of UPS)if(u.type==='bMult'&&u.bIdx===i&&has(u.id))m*=u.v;return m;}
@@ -1070,6 +1177,7 @@ function clickPower(){
   let p=1;
   for(const u of UPS)if(u.type==='clickMult'&&has(u.id))p*=u.v;
   p*=talentProd('clickMult');p*=(1+npcSum('clickMult'));
+  p*=(1+prestigeSum('clickMult'));
   return (p+cps()*clickCpsPct())*globalMult();
 }
 /* 资料片：按类型汇总神装（加法 / 乘法） */
@@ -1106,11 +1214,11 @@ const PERKS=[
   {id:'dailyBonus',ch:'常',name:'日常加倍', desc:'日常任务奖励 +25%',  base:10, growth:2.5, max:4},
 ];
 function perkLevel(id){return state.perks[id]||0;}
-function perkCost(p){return Math.ceil(p.base*Math.pow(p.growth,perkLevel(p.id)));}
-function critChance(){return Math.min(0.75,0.05+upSum('critChance')+talentSum('critChance'));}
+function perkCost(p){return Math.ceil(p.base*Math.pow(p.growth,perkLevel(p.id))*(1-prestigeSum('perkMult')*0.5));}
+function critChance(){return Math.min(0.75,0.05+upSum('critChance')+talentSum('critChance')+prestigeSum('critChance'));}
 function critMultVal(){return (50+50*perkLevel('critdmg'))*upProd('critMul')*talentProd('critMul');}
 function autoClickRate(){return upSum('autoClick')*(1+talentSum('autoMult'))*(1+npcSum('autoMult'));}
-function offlineEff(){return Math.min(1,0.5+perkLevel('dream')*0.1+upSum('offline')+talentSum('offline')+npcSum('offline'));}
+function offlineEff(){return Math.min(1,0.5+perkLevel('dream')*0.1+upSum('offline')+talentSum('offline')+npcSum('offline')+prestigeSum('offline'));}
 function offlineCap(){return 86400+perkLevel('sleep')*12*3600+talentSum('offlineCap');}
 
 /* ============ 天赋树逻辑 ============ */
@@ -1143,11 +1251,21 @@ function talentProd(type){let v=1;TALENTS.forEach(ta=>{if(ta.type===type)v*=(1+t
 function npcFav(id){return state.np[id]||0;}
 function addNpcFav(id,amt){
   const npc=NPCS.find(n=>n.id===id);if(!npc)return;
+  amt=amt*(1+prestigeSum('npcFavMult'));
   state.np[id]=Math.min(npc.maxFav,(state.np[id]||0)+amt);
 }
 function npcPerkActive(npc,perk){return npc&&perk&&npcFav(npc.id)>=perk.fav;}
 /* NPC 效果汇总 */
-function npcSum(type){let v=0;NPCS.forEach(npc=>{npc.perks.forEach(p=>{if(p.type===type&&npcPerkActive(npc,p))v+=p.val;});});return v;}
+function npcSum(type){
+  let v=0;
+  NPCS.forEach(npc=>{npc.perks.forEach(p=>{if(p.type===type&&npcPerkActive(npc,p))v+=p.val;});});
+  /* NPC 互动事件链奖励 */
+  NPC_EVENTS.forEach(ev=>{
+    const key=ev.npcId+'_'+ev.fav;
+    if(npcEventsDone[key]&&ev.reward===type)v+=ev.val;
+  });
+  return v;
+}
 
 /* ============ 黑历史图鉴 ============ */
 function recordDark(templateId,vars){
@@ -1510,9 +1628,10 @@ let parts=[];
 function resizeCv(){cv.width=innerWidth;cv.height=innerHeight;}
 let _rszT;addEventListener('resize',()=>{clearTimeout(_rszT);_rszT=setTimeout(resizeCv,120);});resizeCv();
 function spawnBurst(x,y,n){
+  const comboBonus=Math.min(combo,20);
   for(let i=0;i<n;i++){
-    const a=Math.random()*Math.PI*2,sp=1+Math.random()*3;
-    parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1.6,life:1,size:1.5+Math.random()*2.5,g:.05});
+    const a=Math.random()*Math.PI*2,sp=1+Math.random()*(3+comboBonus*0.3);
+    parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1.6-comboBonus*0.1,life:1,size:1.5+Math.random()*(2.5+comboBonus*0.1),g:.05});
   }
 }
 function spawnAmbient(){
@@ -1520,14 +1639,31 @@ function spawnAmbient(){
   parts.push({x:Math.random()*cv.width,y:cv.height+10,vx:(Math.random()-.5)*.3,
     vy:-(.4+Math.random()*.8),life:1,size:.8+Math.random()*2,g:0});
 }
+/* 金币雨特效 */
+function spawnGoldRain(n){
+  for(let i=0;i<n;i++){
+    parts.push({x:Math.random()*cv.width,y:-20,vx:(Math.random()-.5)*2,
+      vy:2+Math.random()*4,life:1,size:2+Math.random()*3,g:0.1,color:'#ffd98a'});
+  }
+}
 function drawParts(){
   cx.clearRect(0,0,cv.width,cv.height);
+  /* 连击边缘燃烧效果 */
+  if(combo>=20){
+    const intensity=Math.min((combo-20)/30,1);
+    const gradient=cx.createRadialGradient(cv.width/2,cv.height/2,cv.height*0.3,cv.width/2,cv.height/2,cv.height*0.8);
+    gradient.addColorStop(0,'rgba(255,100,60,0)');
+    gradient.addColorStop(1,`rgba(255,80,40,${intensity*0.15})`);
+    cx.fillStyle=gradient;
+    cx.fillRect(0,0,cv.width,cv.height);
+  }
+  /* 绘制粒子 */
   for(let i=parts.length-1;i>=0;i--){
     const p=parts[i];
     p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.life-=.008+(p.size>2?.004:0);
     if(p.life<=0||p.y<-20){parts.splice(i,1);continue;}
     cx.globalAlpha=Math.max(0,Math.min(1,p.life))*.9;
-    cx.fillStyle=p.g?'#ffd98a':'#e6c26e';
+    cx.fillStyle=p.color||(p.g?'#ffd98a':'#e6c26e');
     cx.beginPath();cx.arc(p.x,p.y,p.size,0,7);cx.fill();
   }
   cx.globalAlpha=1;
@@ -1548,13 +1684,22 @@ function comboMax(){return 40+talentSum('comboMax')+upSum('comboMax')+perkLevel(
 function comboMultVal(){return 1+Math.min(Math.max(combo-1,0),comboMax())*0.05;}
 function updateCombo(){
   const b=document.getElementById('comboBadge');
-  if(combo<5){b.classList.remove('show','hot1','hot2','hot3');return;}
+  const avatar=document.getElementById('dantian');
+  if(combo<5){
+    b.classList.remove('show','hot1','hot2','hot3');
+    avatar.classList.remove('glow1','glow2','glow3');
+    return;
+  }
   document.getElementById('comboN').textContent='×'+comboMultVal().toFixed(2);
   document.getElementById('comboT').textContent='连击 '+combo;
   b.classList.remove('pop');void b.offsetWidth;b.classList.add('show','pop');
   b.classList.toggle('hot1',combo>=10&&combo<20);
   b.classList.toggle('hot2',combo>=20&&combo<30);
   b.classList.toggle('hot3',combo>=30);
+  /* 头像光环随连击增强 */
+  avatar.classList.toggle('glow1',combo>=10&&combo<20);
+  avatar.classList.toggle('glow2',combo>=20&&combo<30);
+  avatar.classList.toggle('glow3',combo>=30);
 }
 function playCritVoice(){
   if(state.muted)return;
@@ -1573,6 +1718,7 @@ function critFX(x,y,g){
   ct.innerHTML='<b>'+CRIT_LINES[Math.floor(Math.random()*CRIT_LINES.length)]+'</b><span>+'+fmt(g)+' 金币</span>';
   ct.classList.remove('go');void ct.offsetWidth;ct.classList.add('go');
   spawnBurst(x,y,70);
+  spawnGoldRain(30);
   const fn=document.createElement('div');fn.className='float-num crit';fn.textContent='+'+fmt(g);
   fn.style.left=Math.max(20,Math.min(innerWidth-140,x-60))+'px';fn.style.top=(y-60)+'px';
   document.body.appendChild(fn);setTimeout(()=>fn.remove(),1300);
@@ -1598,6 +1744,10 @@ function migrateState(){
   if(!state.np||typeof state.np!=='object')state.np={};
   if(!Array.isArray(state.darkHistory))state.darkHistory=[];
   if(!state.tribDone||typeof state.tribDone!=='object')state.tribDone={};
+  if(!state.legacy||typeof state.legacy!=='object')state.legacy={bestCps:0,totalCps:0};
+  if(!state.prestigeNodes||typeof state.prestigeNodes!=='object')state.prestigeNodes={};
+  if(!state.npcEventsDone||typeof state.npcEventsDone!=='object')state.npcEventsDone={};
+  npcEventsDone=state.npcEventsDone;
   ensureDaily();
 }
 function saveGame(){state.lastSave=Date.now();state._v=2;try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch(e){if(e&&e.name==='QuotaExceededError'){try{const s=Object.assign({},state);s.daily=null;localStorage.setItem(SAVE_KEY,JSON.stringify(s));}catch(e2){console.warn('存档空间不足，请导出备份');}}else console.warn('存档失败',e);}}
@@ -1992,6 +2142,36 @@ function updatePrestige(){
   const btn=$('#pvBtn');
   btn.disabled=g<1;
   btn.classList.toggle('ready',g>=1);
+  updatePrestigeTree();
+}
+/* ============ 飞升悟道树 UI ============ */
+let ptBuilt=false;
+function buildPrestigeTree(){
+  const list=$('#prestigeTreeList');if(!list)return;
+  list.innerHTML='';
+  PRESTIGE_TREE.forEach(n=>{
+    const card=document.createElement('div');card.className='pt-node';card.dataset.id=n.id;
+    card.innerHTML='<div class="pt-ch">'+n.ch+'</div>'+
+      '<div class="pt-info"><div class="pt-name">'+n.name+'</div>'+
+      '<div class="pt-desc">'+n.desc+'</div>'+
+      '<div class="pt-req">需要飞升 '+n.req+' 次</div></div>'+
+      '<div class="pt-status"></div>';
+    card.addEventListener('click',()=>{if(card.classList.contains('available'))unlockPrestigeNode(n.id);});
+    list.appendChild(card);
+  });
+  ptBuilt=true;
+}
+function updatePrestigeTree(){
+  if(!ptBuilt)buildPrestigeTree();
+  const list=$('#prestigeTreeList');if(!list)return;
+  PRESTIGE_TREE.forEach(n=>{
+    const card=list.querySelector('[data-id="'+n.id+'"]');if(!card)return;
+    const unlocked=prestigeNodeUnlocked(n.id);
+    const available=!unlocked&&state.ascends>=n.req;
+    card.className='pt-node'+(unlocked?' unlocked':available?' available':' locked');
+    const status=card.querySelector('.pt-status');
+    status.textContent=unlocked?'已领悟':available?'可领悟':'未达成';
+  });
 }
 function updateStats(){
   set('sLife',fmt(state.lifetimeAll));set('sRun',fmt(state.runLifetime));
@@ -2018,6 +2198,11 @@ function updateAll(){
 /* ============ 回家过年 ============ */
 function doPrestige(g){
   g=g||jadeGain();if(g<1)return;
+  /* 继承机制：记录本局最高 CPS */
+  const curCps=cps();
+  if(!state.legacy)state.legacy={bestCps:0,totalCps:0};
+  if(curCps>state.legacy.bestCps)state.legacy.bestCps=curCps;
+  state.legacy.totalCps=(state.legacy.totalCps||0)+curCps;
   state.jade+=g;state.ascends++;state.talentPoints=(state.talentPoints||0)+1;
   state.stones=0;state.runLifetime=0;state.clicks=0;state.clickEarned=0;
   state.ups={};BUILDINGS.forEach(b=>state.b[b.id]=0);
@@ -2029,6 +2214,7 @@ function doPrestige(g){
     '<p>爸妈：在外面辛苦了，红包拿好，明年再回来。</p>'+
     '<p>领到 <span class="big">'+g+'</span> 封红包 · 当前永久加成 <span class="big">+'+fmt(state.jade*2)+'%</span></p>'+
     '<p>获得 <span class="big">1</span> 点天赋点 · 共 <span class="big">'+state.talentPoints+'</span> 点可用</p>'+
+    '<p class="gold">前世记忆：最高 CPS '+fmt(state.legacy.bestCps)+' · 继承加成 +'+(state.legacy.bestCps*0.01).toFixed(1)+'%</p>'+
     '<p>休整完毕，返城搬砖。</p>'+
     '<div class="btnrow"><button class="btn" data-close>重新开工</button></div>',{sticky:true});
 }
@@ -2140,7 +2326,7 @@ function loop(){
   if(uiAcc>=0.2){uiAcc=0;updateBuildings();updateUpgrades();updateUnlock();updateShopAff();updateEventBanners();updateDaily();
     if(combo>0&&Date.now()-lastClickAt>800){combo=0;updateCombo();}}
   slowAcc+=dt;
-  if(slowAcc>=1){slowAcc=0;checkAchs();checkTribulations();updatePrestige();updateStats();updateDetail();maybeEvent();buildDarkHistory();
+  if(slowAcc>=1){slowAcc=0;checkAchs();checkTribulations();checkNpcEvents();updatePrestige();updateStats();updateDetail();maybeEvent();buildDarkHistory();
     document.title='金币 '+fmt(state.stones)+' · 挂壁修仙传';}
   if(!document.hidden){if(Math.random()<0.12)spawnAmbient();drawParts();}
   }catch(e){console.error('[loop]',e);}
@@ -2205,7 +2391,9 @@ function bindStatic(){
 function rebuildAll(){
   ensureDaily();
   buildBuildings();buildDetail();buildAchs();applyAchEarned();
-  rebuildUpgrades();buildShop();buildDaily();buildTalentTree();buildNpcs();buildDarkHistory();updateAll();
+  rebuildUpgrades();buildShop();buildDaily();buildTalentTree();buildNpcs();buildDarkHistory();
+  ptBuilt=false;buildPrestigeTree();
+  updateAll();
   $('#muteBtn').textContent=state.muted?'默':'音';
   $$('.buybar button').forEach(x=>x.classList.toggle('active',x.dataset.n===String(state.buyMode)));
 }
@@ -2237,7 +2425,8 @@ window.G={get state(){return state;},fmt:fmt,cps:cps,clickPower:clickPower,
   Voice:Voice,playVoice:playCritVoice,Sound:Sound,
   spendTalent:spendTalent,refundTree:refundTree,talentRank:talentRank,treePoints:treePoints,
   npcFav:npcFav,addNpcFav:addNpcFav,recordDark:recordDark,
-  TRIBULATIONS:TRIBULATIONS,NPCS:NPCS,TALENTS:TALENTS,TREES:TREES,
+  unlockPrestigeNode:unlockPrestigeNode,prestigeNodeUnlocked:prestigeNodeUnlocked,prestigeSum:prestigeSum,
+  PRESTIGE_TREE:PRESTIGE_TREE,TRIBULATIONS:TRIBULATIONS,NPCS:NPCS,TALENTS:TALENTS,TREES:TREES,
   checkTribulations:checkTribulations};
 </script>
 </body>
