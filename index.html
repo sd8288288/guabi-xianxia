@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0c10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="color-scheme" content="dark">
+<title>挂壁修仙传 · 三和大神挂机版</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%230d1226' stroke='%23e6c26e' stroke-width='6'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23e6c26e' font-family='KaiTi,serif'>肝</text></svg>">
+<style>
+/* ============ 基础 ============ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#e6c26e; --gold-bright:#ffd98a; --red:#c0564a; --red-bright:#e89a8a;
+  --ink:rgba(10,13,20,.46); --line:rgba(230,194,110,.2);
+  --text:#eae4d2; --muted:#a39a83; --jade:#9fd8c0;
+}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;
+  color:var(--text);background:#0a0c10;overflow:hidden;
+  -webkit-font-smoothing:antialiased;user-select:none;-webkit-tap-highlight-color:transparent;
+  -webkit-text-size-adjust:100%;overscroll-behavior:none;
+}
+/* 全局禁掉双击缩放，但保留双指缩放与滚动：连点搬砖时不会再被"放大一下"打断 */
+html,body,*{touch-action:manipulation}
+input,textarea{touch-action:manipulation}
+img,button,.bcard,.ucard,.pcard,.dtask,.tab,#dantian{-webkit-touch-callout:none}
+textarea{user-select:text}
+.flv{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif}
+.gold{color:var(--gold-bright)}
+button{font-family:inherit}
+img{-webkit-user-drag:none}
+
+/* ============ 背景 ============ */
+#sky{position:fixed;inset:0;z-index:0;background:radial-gradient(1200px 700px at 60% -10%,#1a2230 0%,#11141d 45%,#0a0c10 100%)}
+#bgimg{position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0;display:none}
+body.has-bg #bgimg{display:block}
+body.has-bg .moon,body.has-bg .mountains,body.has-bg .cloud{display:none}
+.bgshade{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(6,8,12,.38),rgba(6,8,12,.12) 45%,rgba(6,8,12,.42))}
+.moon{position:fixed;right:10%;top:7%;width:86px;height:86px;border-radius:50%;z-index:0;
+  background:radial-gradient(circle at 35% 32%,#eef2f8,#c9d4e4 55%,#9fadc4);
+  box-shadow:0 0 70px 24px rgba(200,215,235,.14);animation:moonfloat 9s ease-in-out infinite alternate}
+@keyframes moonfloat{from{transform:translateY(0)}to{transform:translateY(12px)}}
+.mountains{position:fixed;left:0;right:0;bottom:0;width:100%;height:32vh;z-index:0;opacity:.9}
+.cloud{position:fixed;height:70px;border-radius:50%;background:rgba(190,205,235,.05);filter:blur(26px);z-index:0;animation:drift 80s linear infinite}
+.cloud.c1{top:16%;left:-320px;width:520px}
+.cloud.c2{top:36%;left:-220px;width:380px;animation-duration:110s;animation-delay:-50s;background:rgba(190,205,235,.04)}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 700px))}}
+#particles{position:fixed;inset:0;z-index:50;pointer-events:none}
+.vignette{position:fixed;inset:0;z-index:40;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,transparent 58%,rgba(2,3,6,.45))}
+
+/* ============ 顶栏 ============ */
+header{position:relative;z-index:10;display:flex;align-items:center;gap:20px;padding:12px 22px;
+  background:linear-gradient(180deg,rgba(8,10,15,.8),rgba(8,10,15,.42));
+  border-bottom:1px solid rgba(230,194,110,.22);backdrop-filter:blur(12px);
+  box-shadow:0 6px 24px rgba(0,0,0,.35)}
+.brand{display:flex;align-items:center;gap:12px;margin-right:auto;position:relative}
+.logo{width:42px;height:42px;flex:none;filter:drop-shadow(0 0 10px rgba(230,194,110,.25))}
+.brand h1{font-size:21px;letter-spacing:5px;color:var(--gold-bright);font-weight:700;
+  text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.brand .sub{font-size:11px;color:var(--muted);letter-spacing:3px;margin-left:2px}
+.res{text-align:right}
+.res-main{font-size:28px;font-weight:700;color:var(--gold-bright);line-height:1.15;font-variant-numeric:tabular-nums;
+  text-shadow:0 0 18px rgba(255,217,138,.35)}
+.res-main label{font-size:12px;color:var(--muted);margin-left:6px;letter-spacing:2px;font-weight:400}
+.res-sub{display:flex;justify-content:flex-end;gap:8px;margin-top:3px}
+.mchip{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);
+  background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:2px 11px;
+  font-variant-numeric:tabular-nums}
+.mchip b{color:var(--text);font-weight:600}
+.jade-chip{display:inline-flex;align-items:center;gap:4px;margin-top:4px;font-size:12px;color:#f0b5a8;
+  background:rgba(192,86,74,.1);border:1px solid rgba(192,86,74,.3);border-radius:999px;padding:2px 11px;
+  font-variant-numeric:tabular-nums}
+.jade-chip b{font-size:13px}
+.tools{display:flex;gap:8px}
+.tools button{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);cursor:pointer;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
+  color:var(--gold);font-size:15px;transition:all .15s;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.tools button:hover{background:rgba(230,194,110,.15);transform:translateY(-1px)}
+
+/* ============ 主布局 ============ */
+main{position:relative;z-index:5;display:flex;gap:18px;height:calc(100vh - 69px);padding:16px 22px}
+@supports (height:100dvh){main{height:calc(100dvh - 69px)}}
+.left{width:330px;flex:none;display:flex;flex-direction:column;align-items:center;gap:14px;padding:26px 18px;
+  background:var(--ink);border:1px solid var(--line);border-radius:18px;backdrop-filter:blur(14px) saturate(1.1);
+  box-shadow:0 12px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.05)}
+.right{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--ink);border:1px solid var(--line);
+  border-radius:18px;backdrop-filter:blur(14px) saturate(1.1);overflow:hidden;
+  box-shadow:0 12px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.05)}
+.side-extra{display:flex;flex-direction:column;align-items:center;gap:10px}
+
+/* ============ 大神头像 ============ */
+.dantian-wrap{position:relative;width:250px;height:250px;display:grid;place-items:center;margin-top:6px;flex:none}
+.ring{position:absolute;top:50%;left:50%;border-radius:50%;border:1px dashed rgba(230,194,110,.3)}
+.ring.r1{width:246px;height:246px;animation:spinr 16s linear infinite}
+.ring.r2{width:284px;height:284px;border-color:rgba(230,194,110,.18);animation:spinr 26s linear infinite reverse}
+.ring.r3{width:322px;height:322px;border-color:rgba(230,194,110,.09);animation:spinr 40s linear infinite}
+@keyframes spinr{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+#dantian{width:192px;height:192px;border-radius:50%;cursor:pointer;position:relative;z-index:1;overflow:hidden;
+  border:2px solid rgba(230,194,110,.55);display:grid;place-items:center;padding:0;background:#11141c;
+  box-shadow:0 0 40px rgba(120,90,40,.25),0 6px 24px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.5);
+  transition:transform .08s;animation:breathe 4.5s ease-in-out infinite}
+#dantian::after{content:'';position:absolute;inset:-10px;border-radius:50%;
+  border:1px solid rgba(230,194,110,.35);animation:halopulse 3s ease-in-out infinite;pointer-events:none}
+@keyframes halopulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.03)}}
+#dantian img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;
+  filter:contrast(1.04) saturate(1.08)}
+#dantian:hover{transform:scale(1.04);box-shadow:0 0 62px rgba(230,194,110,.32),0 6px 24px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.5)}
+/* 按下反馈只缩放里面的头像，按钮本身的点击区域保持 100%，连点不会因为缩小而漏点 */
+#dantian:active{transform:none}
+#dantian img{transition:transform .08s}
+#dantian:active img{transform:scale(.93)}
+@keyframes breathe{
+  0%,100%{box-shadow:0 0 34px rgba(120,90,40,.2),0 6px 24px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.5)}
+  50%{box-shadow:0 0 62px rgba(230,194,110,.32),0 6px 24px rgba(0,0,0,.5),inset 0 0 30px rgba(0,0,0,.5)}
+}
+.face-stack{position:relative;width:192px;height:192px;z-index:1}
+#dantian img#eyesClosed{position:absolute;inset:0;opacity:0}
+#dantian.blink img#eyesClosed{opacity:1}
+.nameplate{padding:6px 20px;font-size:14px;letter-spacing:5px;text-indent:5px;color:var(--gold-bright);
+  background:linear-gradient(180deg,rgba(230,194,110,.13),rgba(230,194,110,.04));
+  border:1px solid rgba(230,194,110,.4);border-radius:4px;
+  clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);text-shadow:0 0 10px rgba(255,217,138,.35)}
+.click-stats{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.click-stats b{color:var(--gold-bright);font-size:16px}
+.quote{font-size:13px;color:#988f79;text-align:center;line-height:1.9;max-width:270px;min-height:3.4em;
+  transition:opacity .4s;padding:9px 14px;border:1px dashed rgba(230,194,110,.22);border-radius:10px;
+  background:rgba(255,255,255,.025)}
+.quote::before{content:'「';color:var(--gold)}
+.quote::after{content:'」';color:var(--gold)}
+
+/* ============ 页签 ============ */
+.tabs{display:flex;gap:4px;padding:8px 14px 0;border-bottom:1px solid var(--line);flex:none;overflow-x:auto;
+  background:rgba(0,0,0,.07)}
+.tab{background:none;border:none;color:var(--muted);font-size:15px;letter-spacing:3px;padding:10px 14px 12px;
+  cursor:pointer;position:relative;white-space:nowrap;transition:color .2s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--gold-bright);text-shadow:0 0 12px rgba(255,217,138,.35)}
+.tab.active::after{content:'';position:absolute;left:12px;right:12px;bottom:-1px;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);box-shadow:0 0 8px rgba(230,194,110,.6)}
+.tab.dot::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold-bright);
+  margin-right:6px;box-shadow:0 0 6px var(--gold-bright);vertical-align:2px}
+.panes{flex:1;min-height:0;position:relative}.pane{display:none;height:100%;overflow-y:auto;padding:14px 18px 26px}
+.pane.active{display:block}
+.pane-title{display:flex;align-items:center;gap:8px;color:var(--gold);letter-spacing:3px;font-size:15px;margin:8px 0 12px}
+.pane-title::before{content:'';width:3px;height:14px;border-radius:2px;
+  background:linear-gradient(180deg,var(--gold-bright),rgba(230,194,110,.2))}
+.pane-hint{font-size:12px;color:var(--muted);margin-bottom:12px}
+.pane-hint b{color:var(--gold)}
+
+/* ============ 家当卡片 ============ */
+.buybar{display:inline-flex;align-items:center;gap:2px;font-size:12px;color:var(--muted);margin-bottom:12px;
+  background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:4px}
+.buybar .blabel{padding:0 10px 0 8px;letter-spacing:1px}
+.buybar button{background:transparent;border:none;color:var(--muted);border-radius:8px;
+  padding:5px 15px;cursor:pointer;font-size:12px;transition:all .15s}
+.buybar button:hover{color:var(--text)}
+.buybar button.active{color:#1a1408;font-weight:700;
+  background:linear-gradient(180deg,rgba(255,217,138,.95),rgba(214,174,96,.92));
+  box-shadow:0 2px 10px rgba(230,194,110,.35),inset 0 1px 0 rgba(255,255,255,.4)}
+.unlock{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:9px 14px;
+  border:1px dashed rgba(230,194,110,.3);border-radius:10px;background:rgba(0,0,0,.18)}
+.unlock .uhint{font-size:12px;color:var(--muted);flex:none}
+.unlock .uhint b{color:var(--gold);font-weight:600}
+.unlock .ubar{flex:1;height:6px;background:rgba(0,0,0,.4);border-radius:3px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.05)}
+.unlock .ubar i{display:block;height:100%;width:0;border-radius:3px;
+  background:linear-gradient(90deg,#8a6d2f,var(--gold),var(--gold-bright));transition:width .3s}
+.bcard{position:relative;display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:14px;
+  border:1px solid rgba(230,194,110,.14);margin-bottom:9px;cursor:pointer;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.018));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 12px rgba(0,0,0,.28);
+  transition:border-color .15s,transform .12s,box-shadow .15s,opacity .2s}
+.bcard::before{content:'';position:absolute;left:0;top:12px;bottom:12px;width:3px;border-radius:2px;
+  background:linear-gradient(180deg,var(--gold-bright),rgba(230,194,110,.15));opacity:0;transition:opacity .15s}
+.bcard:hover{border-color:rgba(230,194,110,.4);transform:translateY(-2px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 22px rgba(0,0,0,.4)}
+.bcard:active{transform:translateY(0) scale(.985)}
+.bcard.can{border-color:rgba(230,194,110,.5);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 20px rgba(230,194,110,.12),0 4px 14px rgba(0,0,0,.3)}
+.bcard.can::before{opacity:1}
+.bcard.can .bcost{color:var(--gold-bright);text-shadow:0 0 10px rgba(255,217,138,.35)}
+.bcard.cannot{opacity:.55}
+.bicon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;flex:none;font-size:25px;
+  color:var(--gold-bright);background:linear-gradient(160deg,rgba(230,194,110,.18),rgba(230,194,110,.04));
+  border:1px solid rgba(230,194,110,.38);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 3px 10px rgba(0,0,0,.3);
+  text-shadow:0 0 12px rgba(255,217,138,.4)}
+.binfo{flex:1;min-width:0}
+.bname{font-size:15px;font-weight:600}
+.bcount{margin-left:8px;font-size:12px;color:#1a1408;font-weight:700;
+  background:linear-gradient(180deg,rgba(255,217,138,.95),rgba(214,174,96,.9));
+  padding:1px 9px;border-radius:10px;font-variant-numeric:tabular-nums;
+  box-shadow:0 1px 6px rgba(230,194,110,.3)}
+.bcard:not(.can) .bcount{color:var(--gold-bright);font-weight:600;background:rgba(230,194,110,.1);
+  border:1px solid var(--line);box-shadow:none}
+.bdesc{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bsub{font-size:12px;color:#b3a98f;margin-top:2px;font-variant-numeric:tabular-nums}
+.bbuy{text-align:right;flex:none;min-width:112px}
+.bcost{font-size:15px;font-weight:700;color:#7d7666;font-variant-numeric:tabular-nums}
+.bper{font-size:11px;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.shake{animation:shake .25s}
+
+/* ============ 神装卡片 ============ */
+.ucard{position:relative;display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:14px;
+  border:1px solid rgba(230,194,110,.14);margin-bottom:9px;cursor:pointer;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.018));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 12px rgba(0,0,0,.28);
+  transition:border-color .15s,opacity .2s,transform .12s}
+.ucard:hover{border-color:rgba(230,194,110,.4);transform:translateY(-2px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 22px rgba(0,0,0,.4)}
+.ucard:active{transform:translateY(0) scale(.985)}
+.ucard .bicon{width:42px;height:42px;font-size:20px;border-radius:10px}
+.uname{font-size:14px;font-weight:600}
+.udesc{font-size:12px;color:var(--muted);margin-top:2px}
+.ucost{margin-left:auto;font-size:13px;font-weight:700;color:#7d7666;flex:none;font-variant-numeric:tabular-nums}
+.ucard.can{border-color:rgba(230,194,110,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 20px rgba(230,194,110,.12)}
+.ucard.can .ucost{color:var(--gold-bright);text-shadow:0 0 10px rgba(255,217,138,.35)}
+.ucard.cannot{opacity:.55}
+.empty{text-align:center;color:var(--muted);padding:46px 0;font-size:13px;letter-spacing:2px;
+  border:1px dashed rgba(230,194,110,.2);border-radius:12px;background:rgba(0,0,0,.14)}
+
+/* ============ 成就 ============ */
+#aGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:9px}
+.acard{position:relative;padding:13px 8px;text-align:center;border:1px solid rgba(230,194,110,.12);border-radius:13px;
+  background:rgba(255,255,255,.02);opacity:.4;filter:grayscale(.9);transition:all .3s}
+.acard .aicon{width:38px;height:38px;margin:0 auto 6px;border-radius:9px;display:grid;place-items:center;
+  font-size:19px;color:var(--gold-bright);border:1px solid rgba(230,194,110,.3);
+  background:rgba(230,194,110,.05)}
+.acard .aname{font-size:13px;font-weight:600}
+.acard .adesc{font-size:11px;color:var(--muted);margin-top:3px}
+.acard.earned{opacity:1;filter:none;border-color:rgba(230,194,110,.5);
+  background:linear-gradient(180deg,rgba(230,194,110,.09),rgba(230,194,110,.03));
+  box-shadow:0 0 16px rgba(230,194,110,.1),inset 0 1px 0 rgba(255,255,255,.06)}
+.acard.earned::after{content:'✓';position:absolute;top:5px;right:8px;font-size:11px;color:var(--gold-bright);
+  text-shadow:0 0 6px rgba(255,217,138,.6)}
+
+/* ============ 过年 ============ */
+.pv-wrap{max-width:560px;margin:18px auto 0;text-align:center;padding:30px 26px;
+  border:1px solid rgba(192,86,74,.4);border-radius:18px;
+  background:linear-gradient(180deg,rgba(192,86,74,.09),rgba(192,86,74,.03));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 10px 30px rgba(0,0,0,.3)}
+.pv-icon{width:64px;height:64px;margin:0 auto 10px;border-radius:14px;display:grid;place-items:center;font-size:32px;
+  color:var(--red-bright);border:1px solid rgba(192,86,74,.55);background:rgba(192,86,74,.14);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 18px rgba(192,86,74,.2)}
+.pv-wrap h3{color:var(--red-bright);letter-spacing:6px;font-size:20px;margin-bottom:10px}
+.pv-desc{font-size:13px;color:var(--muted);line-height:2;margin-bottom:16px}
+.pv-stats{display:flex;justify-content:center;gap:12px;font-size:12px;color:var(--muted);margin-bottom:16px;flex-wrap:wrap}
+.pv-stats span{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.07);border-radius:999px;padding:5px 14px}
+.pv-stats b{color:var(--gold-bright);font-size:15px;margin-left:4px;font-variant-numeric:tabular-nums}
+.pv-bar{height:14px;border-radius:8px;background:rgba(0,0,0,.4);border:1px solid var(--line);overflow:hidden;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.5)}
+#pvBar{height:100%;width:0;background:linear-gradient(90deg,#8f3b31,#c0564a,#e08a5e);transition:width .4s;
+  box-shadow:0 0 12px rgba(224,138,94,.5)}
+.pv-text{font-size:12px;color:var(--muted);margin:10px 0 18px;font-variant-numeric:tabular-nums}
+@keyframes redpulse{0%,100%{box-shadow:0 0 0 0 rgba(224,138,94,.45)}50%{box-shadow:0 0 0 9px rgba(224,138,94,0)}}
+.btn-danger.ready{animation:redpulse 1.6s ease-out infinite;border-color:rgba(232,154,138,.8)}
+
+/* ============ 明细与统计 ============ */
+.mrow{display:flex;justify-content:space-between;gap:12px;padding:9px 6px;border-radius:8px;
+  border-bottom:1px dashed rgba(255,255,255,.07);font-size:13px;transition:background .15s}
+.mrow:hover{background:rgba(255,255,255,.03)}
+.mrow .k{color:var(--muted)}
+.mrow .v{font-variant-numeric:tabular-nums}
+.mrow.hot .v{color:var(--gold-bright);font-weight:700;text-shadow:0 0 10px rgba(255,217,138,.3)}
+.drow{margin-bottom:10px}
+.drow .dhead{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px;font-variant-numeric:tabular-nums}
+.drow .dhead b{color:var(--text);font-weight:600;margin-left:6px}
+.dbar{height:8px;background:rgba(0,0,0,.35);border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
+.dbar i{display:block;height:100%;background:linear-gradient(90deg,#8a6d2f,var(--gold),var(--gold-bright));
+  border-radius:4px;width:0;transition:width .4s;box-shadow:0 0 8px rgba(230,194,110,.25)}
+
+/* ============ 按钮 / 弹窗 / 提示 ============ */
+.btn,.btn-danger{padding:10px 26px;border-radius:10px;cursor:pointer;font-size:14px;letter-spacing:2px;
+  border:1px solid rgba(230,194,110,.35);color:var(--gold-bright);transition:all .15s;
+  background:linear-gradient(180deg,rgba(230,194,110,.16),rgba(230,194,110,.05));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 3px 12px rgba(0,0,0,.3)}
+.btn:hover{background:linear-gradient(180deg,rgba(230,194,110,.24),rgba(230,194,110,.08));transform:translateY(-1px)}
+.btn:active{transform:translateY(0) scale(.97)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.btn-danger{border-color:rgba(192,86,74,.6);color:var(--red-bright);
+  background:linear-gradient(180deg,rgba(192,86,74,.32),rgba(140,50,40,.18))}
+.btn-danger:hover{background:linear-gradient(180deg,rgba(192,86,74,.48),rgba(140,50,40,.3));transform:translateY(-1px)}
+.btn-danger:disabled{opacity:.35;cursor:not-allowed;transform:none;animation:none}
+.btnrow{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.modal-back{position:fixed;inset:0;z-index:100;background:rgba(3,5,9,.74);backdrop-filter:blur(5px);
+  display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;padding:20px}
+.modal-back.show{opacity:1}
+.modal{position:relative;width:min(540px,94vw);max-height:82vh;overflow-y:auto;text-align:center;
+  background:linear-gradient(180deg,#181d2b,#0f1219);border:1px solid rgba(230,194,110,.35);border-radius:18px;
+  padding:30px 26px;box-shadow:0 24px 70px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.06);
+  transform:translateY(10px);transition:transform .2s}
+.modal-back.show .modal{transform:none}
+.modal::before{content:'';position:absolute;top:0;left:28px;right:28px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(230,194,110,.65),transparent)}
+.modal h3{color:var(--gold-bright);letter-spacing:5px;font-size:20px;margin-bottom:14px;
+  text-shadow:0 0 14px rgba(255,217,138,.3)}
+.modal p{font-size:13px;color:var(--muted);line-height:2;margin-bottom:10px}
+.modal .big{font-size:24px;color:var(--gold-bright);font-weight:700;font-variant-numeric:tabular-nums;
+  text-shadow:0 0 14px rgba(255,217,138,.4)}
+.warn{color:#d8948a !important}
+textarea{width:100%;height:92px;background:rgba(0,0,0,.4);border:1px solid var(--line);border-radius:8px;
+  color:var(--text);padding:8px;font-size:12px;resize:none;margin:8px 0}
+.chk{font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+input[type=checkbox]{accent-color:var(--gold);width:15px;height:15px}
+#toasts{position:fixed;top:74px;right:20px;z-index:120;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:linear-gradient(180deg,#1a2030,#12151f);border:1px solid rgba(230,194,110,.4);
+  border-left:3px solid var(--gold);color:var(--gold-bright);
+  padding:10px 16px;border-radius:10px;font-size:13px;letter-spacing:1px;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);animation:tin .3s;max-width:300px}
+.toast.out{opacity:0;transform:translateX(10px);transition:.3s}
+@keyframes tin{from{opacity:0;transform:translateX(16px)}to{opacity:1}}
+.float-num{position:fixed;z-index:90;color:var(--gold-bright);font-weight:700;font-size:20px;pointer-events:none;
+  text-shadow:0 0 12px rgba(255,217,138,.65),0 2px 4px rgba(0,0,0,.7);
+  animation:fnum 1.1s ease-out forwards;font-variant-numeric:tabular-nums}
+@keyframes fnum{from{opacity:1;transform:translateY(0) scale(.9)}30%{transform:translateY(-24px) scale(1.08)}
+  to{opacity:0;transform:translateY(-76px) scale(1)}}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:rgba(230,194,110,.25);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:rgba(230,194,110,.4)}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ============ 红包商店 ============ */
+.pcard{position:relative;display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:14px;
+  border:1px solid rgba(192,86,74,.2);margin-bottom:9px;cursor:pointer;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.018));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 12px rgba(0,0,0,.28);
+  transition:border-color .15s,transform .12s,opacity .2s}
+.pcard:hover{border-color:rgba(232,154,138,.5);transform:translateY(-2px)}
+.pcard:active{transform:translateY(0) scale(.985)}
+.pcard .bicon{width:42px;height:42px;font-size:20px;border-radius:10px;color:var(--red-bright);
+  border-color:rgba(192,86,74,.45);background:linear-gradient(160deg,rgba(192,86,74,.2),rgba(192,86,74,.05))}
+.pcard .plv{margin-left:8px;font-size:11px;color:#f0b5a8;background:rgba(192,86,74,.12);
+  border:1px solid rgba(192,86,74,.3);padding:1px 8px;border-radius:9px;font-variant-numeric:tabular-nums}
+.pcost{margin-left:auto;font-size:13px;font-weight:700;color:#8a7668;flex:none;font-variant-numeric:tabular-nums}
+.pcard.can{border-color:rgba(232,154,138,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 20px rgba(192,86,74,.15)}
+.pcard.can .pcost{color:var(--red-bright);text-shadow:0 0 10px rgba(232,154,138,.4)}
+.pcard.cannot{opacity:.55}
+.pcard.maxed{opacity:.45;cursor:default}
+.pcard.maxed .pcost{color:var(--gold);font-size:12px}
+
+/* ============ 随机事件 ============ */
+#eventBanners{position:fixed;top:74px;left:50%;transform:translateX(-50%);z-index:110;
+  display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.evt{display:flex;align-items:center;gap:10px;padding:9px 16px;border-radius:12px;
+  background:linear-gradient(180deg,#1a2338,#12172a);border:1px solid rgba(230,194,110,.4);
+  box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:0;transform:translateY(-14px);
+  transition:opacity .25s,transform .25s;max-width:88vw}
+.evt.show{opacity:1;transform:translateY(0)}
+.evt.bye{opacity:0;transform:translateY(-10px)}
+.evt .ech{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;font-size:17px;flex:none;
+  color:var(--gold-bright);border:1px solid rgba(230,194,110,.4);background:rgba(230,194,110,.08)}
+.evt .etxt{text-align:left}
+.evt .etxt b{display:block;font-size:13px;color:var(--gold-bright)}
+.evt .etxt i{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:1px}
+.evt.bad{border-color:rgba(192,86,74,.55)}
+.evt.bad .ech{color:var(--red-bright);border-color:rgba(192,86,74,.5);background:rgba(192,86,74,.1)}
+.evt.bad .etxt b{color:var(--red-bright)}
+.mchip.evbad{color:var(--red-bright);border-color:rgba(192,86,74,.4);background:rgba(192,86,74,.08)}
+.mchip.evgood{color:var(--gold-bright);border-color:rgba(230,194,110,.4)}
+
+/* ============ 连击 / 暴击 ============ */
+#comboBadge{position:absolute;bottom:0;left:50%;transform:translate(-50%,8px);z-index:4;
+  display:flex;align-items:baseline;gap:8px;padding:4px 14px;border-radius:999px;opacity:0;
+  background:rgba(8,10,16,.85);border:1px solid rgba(230,194,110,.5);pointer-events:none;
+  transition:opacity .2s,transform .2s;white-space:nowrap}
+#comboBadge.show{opacity:1;transform:translate(-50%,0)}
+#comboBadge b{font-size:16px;color:var(--gold-bright);font-variant-numeric:tabular-nums}
+#comboBadge span{font-size:11px;color:var(--muted);letter-spacing:1px}
+#comboBadge.hot1{border-color:rgba(255,160,80,.7)}
+#comboBadge.hot1 b{color:#ffb36b}
+#comboBadge.hot2{border-color:rgba(255,110,60,.8);box-shadow:0 0 16px rgba(255,110,60,.35)}
+#comboBadge.hot2 b{color:#ff8a4d}
+#comboBadge.hot3{border-color:rgba(255,70,50,.9);animation:hotpulse .5s ease-in-out infinite alternate}
+#comboBadge.hot3 b{color:#ff5d47}
+@keyframes hotpulse{from{box-shadow:0 0 14px rgba(255,70,50,.4)}to{box-shadow:0 0 30px rgba(255,70,50,.7)}}
+@keyframes badgepop{0%{transform:translate(-50%,0) scale(1.28)}100%{transform:translate(-50%,0) scale(1)}}
+#comboBadge.pop{animation:badgepop .16s ease-out}
+@keyframes screenshake{
+  0%,100%{transform:translate(0,0) rotate(0)}
+  10%{transform:translate(-9px,5px) rotate(-.6deg)}
+  20%{transform:translate(8px,-6px) rotate(.5deg)}
+  35%{transform:translate(-7px,-4px) rotate(-.4deg)}
+  50%{transform:translate(6px,5px) rotate(.4deg)}
+  65%{transform:translate(-4px,3px) rotate(-.3deg)}
+  80%{transform:translate(3px,-2px) rotate(.2deg)}
+}
+body.shaking{animation:screenshake .45s cubic-bezier(.36,.07,.19,.97)}
+#critfx{position:fixed;inset:0;z-index:80;pointer-events:none;opacity:0;
+  background:radial-gradient(circle at var(--cx,50%) var(--cy,40%),rgba(255,225,150,.6),rgba(255,180,60,.22) 32%,transparent 62%)}
+#critfx.go{animation:critflash .6s ease-out}
+@keyframes critflash{0%{opacity:1}100%{opacity:0}}
+#critRing{position:fixed;width:24px;height:24px;border-radius:50%;border:3px solid rgba(255,217,138,.9);
+  transform:translate(-50%,-50%) scale(.2);z-index:82;pointer-events:none;opacity:0}
+#critRing.go{animation:ringx .55s ease-out}
+@keyframes ringx{0%{opacity:1;transform:translate(-50%,-50%) scale(.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(7)}}
+#critText{position:fixed;left:50%;top:36%;transform:translate(-50%,-50%);z-index:95;pointer-events:none;
+  text-align:center;opacity:0}
+#critText.go{animation:critpop 1.1s ease-out}
+@keyframes critpop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}
+  14%{opacity:1;transform:translate(-50%,-50%) scale(1.22)}
+  28%{transform:translate(-50%,-50%) scale(1)}
+  72%{opacity:1;transform:translate(-50%,-58%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-72%) scale(1.04)}
+}
+#critText b{display:block;font-size:44px;letter-spacing:4px;font-weight:900;
+  background:linear-gradient(180deg,#fff3c4,#ffd24d 45%,#ff9d2e);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 18px rgba(255,180,60,.65)) drop-shadow(0 3px 6px rgba(0,0,0,.6))}
+#critText span{display:block;margin-top:6px;font-size:22px;font-weight:700;color:#ffe9ad;
+  text-shadow:0 0 14px rgba(255,180,60,.7),0 2px 6px rgba(0,0,0,.7);font-variant-numeric:tabular-nums}
+.float-num.crit{font-size:30px;color:#ffd24d;
+  text-shadow:0 0 16px rgba(255,140,40,.8),0 2px 6px rgba(0,0,0,.7);animation-duration:1.3s}
+
+/* ============ 日常任务 ============ */
+.dtask{display:flex;gap:12px;align-items:center;padding:12px 14px;margin-bottom:10px;
+  border:1px solid var(--line);border-radius:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));
+  transition:border-color .18s,background .18s,box-shadow .18s}
+.dtask .dt-ic{width:38px;height:38px;flex:none;display:grid;place-items:center;border-radius:10px;font-size:17px;
+  background:rgba(230,194,110,.1);border:1px solid rgba(230,194,110,.28);color:var(--gold-bright)}
+.dtask .dt-main{flex:1;min-width:0}
+.dtask .dt-name{display:flex;justify-content:space-between;gap:10px;font-size:14px;color:var(--text)}
+.dtask .dt-name em{font-style:normal;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.dtask .dt-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.dtask .dt-bar{height:6px;margin-top:8px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+.dtask .dt-bar i{display:block;height:100%;width:0;border-radius:999px;
+  background:linear-gradient(90deg,#8a6a2f,#e6c26e 60%,#ffd98a);transition:width .25s}
+.dtask .dt-btn{flex:none;padding:6px 12px;border-radius:8px;font-size:12px;cursor:default;
+  border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--muted)}
+.dtask.done{border-color:rgba(159,216,192,.38);background:linear-gradient(180deg,rgba(159,216,192,.09),rgba(159,216,192,.02))}
+.dtask.done .dt-ic{background:rgba(159,216,192,.14);border-color:rgba(159,216,192,.45);color:var(--jade)}
+.dtask.claimable{border-color:rgba(230,194,110,.5);cursor:pointer;
+  box-shadow:0 0 0 1px rgba(230,194,110,.16),0 6px 22px rgba(230,194,110,.12)}
+.dtask.claimable .dt-btn{border-color:rgba(230,194,110,.55);color:var(--gold-bright);cursor:pointer;
+  background:linear-gradient(180deg,rgba(230,194,110,.2),rgba(230,194,110,.07))}
+.dtask.claimable .dt-ic{animation:halopulse 2s ease-in-out infinite}
+.dl-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;
+  font-size:12px;color:var(--muted)}
+.dl-head b{color:var(--gold-bright);font-size:13px}
+#autoChip{display:none}
+body.has-auto #autoChip{display:inline-flex}
+
+/* ============ 天赋树（WoW 风格） ============ */
+.talent-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.talent-header h3{color:var(--gold);letter-spacing:3px;font-size:15px}
+.talent-points{font-size:16px;color:var(--gold-bright);font-weight:700}
+.talent-points b{font-size:22px}
+.talent-tree-wrap{display:flex;gap:20px;position:relative;padding:10px 0}
+.talent-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:16px;position:relative}
+.talent-col-title{text-align:center;font-size:14px;letter-spacing:3px;padding:6px 16px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);margin-bottom:4px}
+.talent-node{width:100%;max-width:200px;padding:10px 12px;border-radius:10px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);
+  transition:all .15s;position:relative;text-align:center}
+.talent-node:hover{border-color:rgba(255,255,255,.25);transform:translateY(-1px)}
+.talent-node:active{transform:scale(.97)}
+.talent-node.available{border-color:rgba(230,194,110,.5);background:rgba(230,194,110,.06);
+  box-shadow:0 0 12px rgba(230,194,110,.1)}
+.talent-node.available:hover{box-shadow:0 0 20px rgba(230,194,110,.2)}
+.talent-node.maxed{border-color:rgba(159,216,192,.4);background:rgba(159,216,192,.06);opacity:.85;cursor:default}
+.talent-node.locked{opacity:.35;cursor:not-allowed}
+.talent-node .tn-name{font-size:13px;font-weight:600;margin-bottom:3px}
+.talent-node .tn-desc{font-size:11px;color:var(--muted);line-height:1.5}
+.talent-node .tn-rank{font-size:11px;color:var(--gold);margin-top:4px;font-variant-numeric:tabular-nums}
+.talent-node.maxed .tn-rank{color:var(--jade)}
+.talent-reset{font-size:12px;padding:6px 16px;border-radius:8px;cursor:pointer;
+  border:1px solid rgba(192,86,74,.4);color:var(--red-bright);background:rgba(192,86,74,.1);
+  transition:all .15s}
+.talent-reset:hover{background:rgba(192,86,74,.2)}
+
+/* ============ 人脉 NPC ============ */
+.npc-card{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;
+  border:1px solid var(--line);margin-bottom:10px;
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012))}
+.npc-ch{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;font-size:20px;flex:none;
+  background:rgba(230,194,110,.1);border:1px solid rgba(230,194,110,.3);color:var(--gold-bright)}
+.npc-info{flex:1;min-width:0}
+.npc-name{font-size:14px;font-weight:600}
+.npc-desc{font-size:11px;color:var(--muted);margin-top:2px}
+.npc-fav-bar{height:6px;margin-top:6px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+.npc-fav-bar i{display:block;height:100%;border-radius:999px;
+  background:linear-gradient(90deg,#8a6a2f,#e6c26e 60%,#ffd98a);transition:width .3s}
+.npc-fav-text{font-size:11px;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums}
+.npc-perks{margin-top:6px}
+.npc-perk{font-size:11px;padding:2px 8px;border-radius:6px;margin-right:4px;margin-bottom:3px;display:inline-block}
+.npc-perk.active{color:var(--jade);background:rgba(159,216,192,.1);border:1px solid rgba(159,216,192,.3)}
+.npc-perk.inactive{color:var(--muted);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08)}
+
+/* ============ 黑历史图鉴 ============ */
+.dh-entry{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:10px;
+  border:1px solid rgba(192,86,74,.15);margin-bottom:8px;
+  background:linear-gradient(180deg,rgba(192,86,74,.04),rgba(192,86,74,.01))}
+.dh-ch{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-size:15px;flex:none;
+  background:rgba(192,86,74,.1);border:1px solid rgba(192,86,74,.3);color:var(--red-bright)}
+.dh-info{flex:1;min-width:0}
+.dh-name{font-size:13px;font-weight:600;color:var(--red-bright)}
+.dh-desc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.6}
+.dh-time{font-size:10px;color:rgba(163,154,131,.6);margin-top:3px}
+.dh-empty{text-align:center;color:var(--muted);padding:40px 0;font-size:13px;
+  border:1px dashed rgba(192,86,74,.2);border-radius:12px;background:rgba(0,0,0,.14)}
+
+/* ============ 渡劫 ============ */
+.trib-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#ff8a6a;
+  background:rgba(255,100,60,.1);border:1px solid rgba(255,100,60,.3);border-radius:999px;padding:2px 11px}
+
+/* ============ 响应式 ============ */
+/* 平板 / 手机：改成「应用外壳」布局——头部与头像区占固定高度，只有右侧面板内部滚动 */
+@media (max-width:920px){
+  body{display:flex;flex-direction:column;overflow:hidden}
+  header{flex:none}
+  main{flex:1;min-height:0;height:auto;flex-direction:column;gap:10px;padding:10px 12px}
+  .left{width:auto;flex:none;flex-direction:row;justify-content:flex-start;align-items:center;gap:14px;
+    padding:12px 14px;border-radius:16px}
+  .dantian-wrap{width:150px;height:150px;margin:0}
+  .face-stack{width:118px;height:118px}
+  #dantian{width:118px;height:118px}
+  .r1{width:132px;height:132px}.r2{width:150px;height:150px}.r3{width:168px;height:168px}
+  .side-extra{align-items:flex-start;gap:7px;flex:1;min-width:0}
+  .quote{display:none}
+  .right{flex:1;min-height:0;height:auto}
+  .panes{flex:1;min-height:0}
+  .pane{padding:12px 14px 22px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  .brand .sub{display:none}
+  .res-main{font-size:22px}
+  .mchip,.jade-chip{font-size:11px}
+  .buybar button{min-height:38px}
+  header{padding:10px 14px;gap:12px}
+  #critText b{font-size:28px}
+}
+
+/* 手机：压缩头部、页签等分铺满、热区放大到 ≥40px、提示改成底部浮层 */
+@media (max-width:560px){
+  header{padding:calc(8px + env(safe-area-inset-top)) 10px 8px;gap:8px}
+  .logo{width:30px;height:30px}
+  .brand{gap:8px;min-width:0}
+  .brand h1{font-size:15px;letter-spacing:1px;white-space:nowrap}
+  .res{min-width:0}
+  .res-main{font-size:20px}
+  .res-main label{font-size:10px;letter-spacing:0;margin-left:4px}
+  .res-sub{gap:4px;margin-top:2px;flex-wrap:wrap;justify-content:flex-end}
+  .mchip,.jade-chip{font-size:11px;padding:2px 7px;gap:3px}
+  .jade-chip{margin-top:0}
+  #chipClick{display:none}   /* 点击收益左侧已经显示一份，手机上去重 */
+  .tools{gap:6px}
+  .tools button{width:40px;height:40px;font-size:14px;border-radius:8px}
+  main{gap:8px;padding:8px 8px calc(10px + env(safe-area-inset-bottom))}
+  .left{gap:12px;padding:10px 12px;border-radius:14px}
+  .dantian-wrap{width:116px;height:116px}
+  .face-stack{width:100px;height:100px}
+  #dantian{width:100px;height:100px}
+  .r1{width:112px;height:112px}.r2{width:128px;height:128px}.r3{width:144px;height:144px}
+  .nameplate{font-size:12px;letter-spacing:3px;text-indent:3px;padding:3px 14px}
+  .click-stats{font-size:11px}
+  .click-stats b{font-size:15px}
+  .tabs{gap:0;padding:0 6px;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:1 1 0;min-width:0;font-size:12px;letter-spacing:0;text-align:center;padding:13px 2px}
+  .tab.active::after{left:6px;right:6px}
+  .pane{padding:10px 10px 20px}
+  .buybar{display:flex;width:100%;margin-bottom:10px}
+  .buybar .blabel{padding:0 6px;font-size:11px}
+  .buybar button{flex:1;min-height:38px;padding:0 4px;font-size:12px}
+  .unlock{padding:8px 10px;gap:8px}
+  .unlock .uhint{font-size:11px}
+  .bcard{padding:10px;gap:9px;border-radius:12px;margin-bottom:8px}
+  .bicon{width:40px;height:40px;font-size:19px;border-radius:10px}
+  .bname{font-size:14px}
+  .bdesc,.bsub,.bper{font-size:11px}
+  .bbuy{min-width:86px}
+  .bcost{font-size:14px}
+  .ucard,.pcard,.dtask{padding:10px}
+  .dtask .dt-btn{min-height:36px;min-width:64px;font-size:12px}
+  .modal{width:94vw;max-height:82dvh;padding:22px 16px;border-radius:14px}
+  .modal h3{font-size:17px;letter-spacing:3px}
+  .modal p{font-size:12px;line-height:1.9}
+  .modal .big{font-size:20px}
+  textarea{font-size:16px;height:104px}   /* iOS 输入框 <16px 会触发聚焦自动放大 */
+  .btn,.btn-danger{padding:11px 18px;font-size:13px;letter-spacing:1px}
+  #eventBanners{top:auto;bottom:calc(64px + env(safe-area-inset-bottom));width:100%;padding:0 10px}
+  .evt{max-width:100%}
+  #toasts{top:auto;bottom:calc(10px + env(safe-area-inset-bottom));right:8px;left:8px;align-items:stretch}
+  .toast{max-width:none;width:100%;text-align:center;font-size:12px;padding:9px 12px}
+  .float-num{font-size:17px}
+}
+
+/* 超窄屏（iPhone SE / 320px）：标题让位，保证头部不换行 */
+@media (max-width:400px){
+  .brand h1{display:none}
+  .logo{width:32px;height:32px}
+  .res-main{font-size:19px}
+  .res-main label{display:none}
+  .tab{font-size:11px;padding:13px 0}
+  .left{gap:10px;padding:9px 10px}
+  .dantian-wrap{width:104px;height:104px}
+  .face-stack,#dantian{width:90px;height:90px}
+  .r1{width:100px;height:100px}.r2{width:114px;height:114px}.r3{width:128px;height:128px}
+}
+
+/* 触屏：彻底去掉 hover 位移（避免点完"粘"在高亮态） */
+@media (hover:none){
+  .bcard:hover,.pcard:hover,.dtask:hover,.btn:hover,.btn-danger:hover,
+  .tools button:hover,.buybar button:hover,#dantian:hover{transform:none}
+  .bcard:active,.pcard:active,.dtask:active{transform:scale(.99)}
+}
+
+/* 横屏矮视口：头像区收到最小，把高度让给列表 */
+@media (max-width:920px) and (max-height:520px){
+  header{padding:6px 10px;gap:10px}
+  .logo{width:26px;height:26px}
+  .brand h1{font-size:14px;letter-spacing:1px}
+  .res-main{font-size:18px}
+  .res-sub{gap:4px;margin-top:1px}
+  .tools button{width:34px;height:34px;font-size:13px}
+  main{gap:6px;padding:6px 8px 8px}
+  .left{padding:6px 10px;gap:10px;border-radius:12px}
+  .dantian-wrap{width:72px;height:72px}
+  .face-stack,#dantian{width:64px;height:64px}
+  .r1,.r2,.r3,.nameplate{display:none}
+  .click-stats{font-size:11px}
+  .click-stats b{font-size:14px}
+  .tabs{padding:0 6px}
+  .tab{padding:8px 2px;font-size:11px}
+  .pane{padding:8px 10px 16px}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important;transition:none !important}
+}
+</style>
+</head>
+<body>
+<div id="sky"></div>
+<img id="bgimg" alt="" src="bg.jpg">
+<div class="bgshade"></div>
+<div class="moon"></div>
+<svg class="mountains" viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <path fill="#1a2440" opacity="0.55" d="M0,200 L90,158 L180,190 L300,118 L420,180 L540,138 L660,190 L780,128 L900,180 L1020,148 L1140,196 L1260,150 L1380,190 L1440,168 L1440,320 L0,320 Z"/>
+  <path fill="#0a101f" opacity="0.92" d="M0,262 L120,230 L240,256 L380,204 L520,250 L660,214 L800,256 L950,210 L1100,252 L1240,220 L1360,256 L1440,236 L1440,320 L0,320 Z"/>
+</svg>
+<div class="cloud c1"></div>
+<div class="cloud c2"></div>
+<div class="vignette"></div>
+<canvas id="particles"></canvas>
+
+<header>
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="47" fill="rgba(230,194,110,.06)" stroke="rgba(230,194,110,.5)" stroke-width="2"/>
+      <text x="50" y="66" font-size="46" text-anchor="middle" fill="#e6c26e" font-family="'PingFang SC','Microsoft YaHei',sans-serif">肝</text>
+    </svg>
+    <h1 class="flv">B桶修仙传</h1>
+    <span class="sub">B桶 · 挂机搬砖版</span>
+  </div>
+  <div class="res">
+    <div class="res-main"><span id="stones">0</span><label>金币</label></div>
+    <div class="res-sub">
+      <span class="mchip" id="chipCps">每秒 <b id="cps">0</b></span>
+      <span class="mchip" id="chipClick">点击 <b id="cpow">1</b></span>
+      <span class="jade-chip">红包 <b id="jade">0</b></span>
+      <span class="mchip" id="autoChip">脚本 <b id="autoRate">0</b>/秒</span>
+      <span id="evtWrap" style="display:contents"></span>
+    </div>
+  </div>
+  <div class="tools">
+    <button id="muteBtn" title="静音开关" class="flv">音</button>
+    <button id="saveBtn" title="立即保存" class="flv">存</button>
+    <button id="setBtn" title="设置" class="flv">设</button>
+  </div>
+</header>
+
+<main>
+  <aside class="left">
+    <div class="dantian-wrap">
+      <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+      <div class="face-stack">
+        <button id="dantian" aria-label="点大神开始搬砖">
+          <img src="avatar.jpg" alt="大神本尊" draggable="false">
+          <img src="avatar-closed.jpg" alt="" id="eyesClosed" draggable="false">
+        </button>
+      </div>
+      <div id="comboBadge"><b id="comboN">×1.00</b><span id="comboT">连击 0</span></div>
+    </div>
+    <div class="side-extra">
+      <div class="nameplate flv">B· 桶</div>
+      <div class="click-stats">点击收益 <b id="clickGain">1</b> 金币</div>
+      <div id="quote" class="quote flv">团长！你是我爹！！！</div>
+    </div>
+  </aside>
+
+  <section class="right">
+    <nav class="tabs">
+      <button class="tab active flv" data-tab="dongfu">家当</button>
+      <button class="tab flv" data-tab="xiulian">明细</button>
+      <button class="tab flv" id="tabGf" data-tab="gongfa">神装</button>
+      <button class="tab flv" data-tab="chengjiu">成就</button>
+      <button class="tab flv" id="tabDaily" data-tab="daily">日常</button>
+      <button class="tab flv" data-tab="feisheng">过年</button>
+      <button class="tab flv" id="tabShop" data-tab="shangdian">红包</button>
+      <button class="tab flv" id="tabTalent" data-tab="talent">天赋</button>
+      <button class="tab flv" id="tabNpc" data-tab="renmai">人脉</button>
+      <button class="tab flv" data-tab="darkhistory">黑历史</button>
+      <button class="tab flv" data-tab="tongji">统计</button>
+    </nav>
+    <div class="panes">
+      <div class="pane active" id="pane-dongfu">
+        <div class="buybar">
+          <span class="blabel">购买数量</span>
+          <button data-n="1" class="active">×1</button>
+          <button data-n="10">×10</button>
+          <button data-n="100">×100</button>
+          <button data-n="max">最大</button>
+        </div>
+        <div class="unlock" id="unlockRow">
+          <span class="uhint" id="uHint">下一件家当</span>
+          <div class="ubar"><i id="uBar"></i></div>
+        </div>
+        <div id="bList"></div>
+      </div>
+      <div class="pane" id="pane-xiulian">
+        <div class="pane-title flv">搬砖明细</div>
+        <div class="mrow"><span class="k">每秒产量</span><span class="v" id="mCps">0</span></div>
+        <div class="mrow"><span class="k">神装加成</span><span class="v" id="mGf">×1</span></div>
+        <div class="mrow"><span class="k">红包加成</span><span class="v" id="mJade">×1</span></div>
+        <div class="mrow"><span class="k">成就加成</span><span class="v" id="mAch">×1</span></div>
+        <div class="mrow hot"><span class="k">总加成</span><span class="v" id="mTotal">×1</span></div>
+        <div class="mrow"><span class="k">事件加成</span><span class="v" id="mEvent">×1</span></div>
+        <div class="mrow"><span class="k">点击收益</span><span class="v" id="mClick">1</span></div>
+        <div class="mrow"><span class="k">脚本自动点击</span><span class="v" id="mAuto">0 /秒</span></div>
+        <div class="mrow"><span class="k">暴击</span><span class="v" id="mCrit">5% · ×50</span></div>
+        <div class="mrow"><span class="k">离线效率</span><span class="v" id="mOff">50% · 24小时</span></div>
+        <div class="pane-title flv" style="margin-top:22px">家当产出占比</div>
+        <div id="dRows"></div>
+      </div>
+      <div class="pane" id="pane-gongfa">
+        <div class="pane-hint">升级神装与伙食，永久提升搬砖效率。<span id="uOwned"></span></div>
+        <div id="uList"></div>
+      </div>
+      <div class="pane" id="pane-chengjiu">
+        <div class="pane-hint">每达成一个成就，全局产量 <b>+1%</b>。<span id="achCount"></span></div>
+        <div id="aGrid"></div>
+      </div>
+      <div class="pane" id="pane-daily">
+        <div class="pane-title flv">今日搬砖任务</div>
+        <div class="dl-head">
+          <span>每天 3 个任务，各自给一笔金币；<b>全部清完再领 1 封红包</b></span>
+          <span id="dStreak">当前连签 1 天</span>
+        </div>
+        <div id="dTasks"></div>
+        <div class="pane-hint" style="margin-top:6px">任务每天 0 点刷新，进度从当天开始算；连签第 7 天额外 +2 封红包。</div>
+      </div>
+      <div class="pane" id="pane-feisheng">
+        <div class="pv-wrap">
+          <div class="pv-icon flv">年</div>
+          <h3 class="flv">回村过年</h3>
+          <p class="pv-desc">世人修仙要渡劫，大神过年要回家。<br>
+            当本局卖出 <b class="gold">1 兆金币</b>，就可以收拾行李回村：<br>
+            金币、家当、神装全部清零，但能领到长辈的<strong class="gold">红包</strong>，<br>
+            每封红包永久提升全局产量 <b class="gold">2%</b>，也可在「红包」页购买永久特权，飞升不清零。</p>
+          <div class="pv-stats">
+            <span>现有红包<b id="pvJade">0</b></span>
+            <span>当前加成<b id="pvBonus">+0%</b></span>
+            <span>回家可领<b id="pvGain">0</b></span>
+          </div>
+          <div class="pv-bar"><div id="pvBar"></div></div>
+          <div id="pvText" class="pv-text">…</div>
+          <button id="pvBtn" class="btn-danger" disabled>回村过年</button>
+        </div>
+      </div>
+      <div class="pane" id="pane-shangdian">
+        <div class="pane-hint">花红包买永久特权，飞升也不清零；留着则每封 +2% 全局产量——花还是攒，自己权衡。<b id="perkJade"></b></div>
+        <div id="pList"></div>
+      </div>
+      <div class="pane" id="pane-talent">
+        <div class="talent-header">
+          <h3 class="flv">天赋树</h3>
+          <div><span class="talent-points">可用天赋点 <b id="talentPts">0</b></span></div>
+        </div>
+        <div class="pane-hint" style="margin-bottom:14px">每次回村过年获得 1 点天赋点，投入天赋树永久增强。点击节点花费点数，每行需累计足够点数才能解锁下一行。</div>
+        <div class="talent-tree-wrap" id="talentTreeWrap"></div>
+      </div>
+      <div class="pane" id="pane-renmai">
+        <div class="pane-title flv">人脉关系</div>
+        <div class="pane-hint">通过随机事件提升 NPC 好感度，好感满了解锁永久被动。飞升时好感清零。</div>
+        <div id="npcList"></div>
+      </div>
+      <div class="pane" id="pane-darkhistory">
+        <div class="pane-title flv">黑历史图鉴</div>
+        <div class="pane-hint">每一次渡劫、封号、回家，都记录在案。共 <b id="dhCount">0</b> 条。</div>
+        <div id="dhList"></div>
+      </div>
+      <div class="pane" id="pane-tongji">
+        <div class="pane-title flv">搬砖生涯</div>
+        <div class="mrow"><span class="k">累计搬出金币（含历次回家）</span><span class="v" id="sLife">0</span></div>
+        <div class="mrow"><span class="k">本局累计金币</span><span class="v" id="sRun">0</span></div>
+        <div class="mrow"><span class="k">每秒产量</span><span class="v" id="sCps">0</span></div>
+        <div class="mrow"><span class="k">点他次数</span><span class="v" id="sClicks">0</span></div>
+        <div class="mrow"><span class="k">点击累计收益</span><span class="v" id="sClickEarned">0</span></div>
+        <div class="mrow"><span class="k">家当总数</span><span class="v" id="sBuilds">0</span></div>
+        <div class="mrow"><span class="k">成就</span><span class="v" id="sAch">0 / 45</span></div>
+        <div class="mrow"><span class="k">红包</span><span class="v" id="sJade">0</span></div>
+        <div class="mrow"><span class="k">回家次数</span><span class="v" id="sAsc">0</span></div>
+        <div class="mrow"><span class="k">总挂机时长</span><span class="v" id="sTime">0秒</span></div>
+        <div class="mrow"><span class="k">脚本点击次数</span><span class="v" id="sAuto">0</span></div>
+        <div class="mrow"><span class="k">手动暴击次数</span><span class="v" id="sCrit">0</span></div>
+        <div class="mrow"><span class="k">日常任务完成</span><span class="v" id="sDaily">0</span></div>
+        <div class="mrow"><span class="k">连签天数</span><span class="v" id="sStreak">1</span></div>
+        <div class="mrow"><span class="k">本局时长</span><span class="v" id="sRunTime">0秒</span></div>
+        <div class="mrow"><span class="k">本次回家开始于</span><span class="v" id="sStart">-</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+<div id="eventBanners"></div>
+<div id="critfx"></div>
+<div id="critRing"></div>
+<div id="critText"></div>
+<div id="toasts"></div>
+
+<script>
+'use strict';
+/* ============ 工具 ============ */
+window.__errs=[];
+window.addEventListener('error',e=>window.__errs.push(String(e.message)));
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const set=(id,v)=>{const e=document.getElementById(id); if(e)e.textContent=v;};
+const UNITS=[[1e88,'大数'],[1e80,'无量'],[1e72,'不可思议'],[1e64,'那由他'],[1e56,'阿僧祇'],[1e48,'恒河沙'],[1e44,'极'],[1e40,'载'],[1e36,'正'],[1e32,'涧'],[1e28,'穰'],[1e24,'秭'],[1e20,'垓'],[1e16,'京'],[1e12,'兆'],[1e8,'亿'],[1e4,'万']];
+function _f(n){
+  if(!isFinite(n))return '∞';
+  if(n<0)return '-'+_f(-n);
+  if(n<1e4){
+    if(n===Math.floor(n))return String(n);
+    if(n>=100)return String(Math.floor(n));
+    return (n<10? n.toFixed(2):n.toFixed(1)).replace(/\.?0+$/,'');
+  }
+  if(n>=1e92)return n.toExponential(2);
+  for(const u of UNITS){
+    if(n>=u[0]){
+      const x=n/u[0];
+      if(x>=100)return x.toFixed(0)+u[1];
+      const s=x.toFixed(x>=10?1:2);
+      return (s.indexOf('.')>=0? s.replace(/0+$/,'').replace(/\.$/,''):s)+u[1];
+    }
+  }
+  return String(n);
+}
+const _fc=new Map();let _ff=0;
+function fmt(n){
+  if(_ff!==window._fr){_ff=window._fr;_fc.clear();}
+  const k=Math.round(n*100);if(_fc.has(k))return _fc.get(k);
+  const r=_f(n);_fc.set(k,r);return r;
+}
+function fmtTime(s){
+  s=Math.floor(s);
+  const d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60),sec=s%60;
+  if(d>0)return d+'天'+h+'小时';
+  if(h>0)return h+'小时'+m+'分';
+  if(m>0)return m+'分'+sec+'秒';
+  return sec+'秒';
+}
+const mult2=n=>'×'+(Math.round(n*100)/100);
+
+/* ============ 数据：家当 ============ */
+const BUILDINGS=[
+  {id:'pc',   name:'老旧主机',   ch:'机', base:15,     cps:0.1,   blurb:'十年老机，风扇声比打雷还响。'},
+  {id:'net',  name:'大水管宽带', ch:'网', base:100,    cps:1,     blurb:'Ping 80，稳如老狗。'},
+  {id:'alt',  name:'挂机小号',   ch:'号', base:1100,   cps:8,     blurb:'人不在，号在搬。'},
+  {id:'multi',name:'多开神器',   ch:'开', base:12000,  cps:47,    blurb:'一拖八，人机合一。'},
+  {id:'studio',name:'搬砖工作室',ch:'室', base:130000, cps:260,   blurb:'表弟侄子齐上阵，管吃管住。'},
+  {id:'dailian',name:'代练接单', ch:'单', base:1.4e6,  cps:1400,  blurb:'白天代打，晚上代肝。'},
+  {id:'bg',   name:'战场挂机',   ch:'战', base:2e7,    cps:7800,  blurb:'奥山一场，从青丝打到白发。'},
+  {id:'gold', name:'金团老板',   ch:'团', base:3.3e8,  cps:44000, blurb:'一脚 8000 金，童叟无欺。'},
+  {id:'shop', name:'金币交易所', ch:'所', base:5.1e9,  cps:260000,blurb:'全服金价，由你定义。'},
+  {id:'god',  name:'挂壁之神',   ch:'神', base:7.5e10, cps:1.6e6, blurb:'出租房里的传说，无人不晓。'},
+  /* —— 后期线：从「包夜」干到「上市」 —— */
+  {id:'netcafe',name:'网吧包夜',  ch:'吧', base:1.1e12, cps:1.2e7,  blurb:'包夜 8 小时，空调、泡面、免费开水。'},
+  {id:'miner',  name:'矿机阵列',  ch:'矿', base:1.7e13, cps:1e8,    blurb:'显卡风扇齐鸣，电表倒着转。'},
+  {id:'script', name:'脚本外包',  ch:'本', base:2.5e14, cps:8e8,    blurb:'外包给隔壁大学生，一夜写好。'},
+  {id:'server', name:'私服一条龙',ch:'服', base:3.8e15, cps:6e9,    blurb:'开服三天，关服跑路，装备全没收。'},
+  {id:'ipo',    name:'挂牌上市',  ch:'市', base:5.7e16, cps:4.5e10, blurb:'敲钟那天，全村的挂逼都来站台。'},
+];
+
+/* ============ 数据：神装 ============ */
+const UPS=[];
+function up(id,name,ch,desc,cost,type,v,extra){UPS.push(Object.assign({id,name,ch,desc,cost,type,v},extra||{}));}
+up('c1','换个鼠标垫','肝','点击收益 ×2',100,'clickMult',2);
+up('c2','机械键盘','肝','点击收益 ×2',2000,'clickMult',2,{req:s=>s.clicks>=30});
+up('c3','鼠标微动改装','肝','点击收益 ×2',6e4,'clickMult',2,{req:s=>s.clicks>=150});
+up('c4','宏编程入门','肝','点击收益 ×2',2e6,'clickMult',2,{req:s=>s.clicks>=500});
+up('c5','双手互搏','肝','点击收益 ×2',8e7,'clickMult',2,{req:s=>s.clicks>=1200});
+up('c6','网瘾大师','肝','点击收益 ×2',4e9,'clickMult',2,{req:s=>s.clicks>=3000});
+up('c7','肝帝之魂','肝','点击收益 ×2',2e11,'clickMult',2,{req:s=>s.clicks>=8000});
+up('k1','聚精会神','聚','点击额外获得每秒产量的 2%',5e4,'clickCps',0.02,{req:s=>cps()>=10});
+up('k2','人机合一','合','点击额外获得每秒产量的 3%',1e7,'clickCps',0.03,{req:s=>cps()>=1000});
+up('k3','肝胆相照','照','点击额外获得每秒产量的 5%',1e9,'clickCps',0.05,{req:s=>cps()>=1e5});
+up('g1','挂逼面管饱','面','全局产量 +10%',5e3,'gMult',0.10,{req:s=>s.lifetimeAll>=2e3});
+up('g2','红牛续命','牛','全局产量 +15%',1.5e5,'gMult',0.15,{req:s=>s.lifetimeAll>=5e4});
+up('g3','火腿肠加蛋','肠','全局产量 +20%',6e6,'gMult',0.20,{req:s=>s.lifetimeAll>=1e6});
+up('g4','空调自由','调','全局产量 +25%',3e8,'gMult',0.25,{req:s=>s.lifetimeAll>=5e7});
+up('g5','荤素搭配','荤','全局产量 +30%',1.5e10,'gMult',0.30,{req:s=>s.lifetimeAll>=2e9});
+up('g6','电脑换新','新','全局产量 +35%',8e11,'gMult',0.35,{req:s=>s.lifetimeAll>=1e11});
+up('g7','人体工学椅','椅','全局产量 +50%',1e14,'gMult',0.50,{req:s=>s.lifetimeAll>=5e12});
+const TIERS=[{n:10,m:50},{n:25,m:400},{n:50,m:4000},{n:100,m:4e4}];
+const TIER_NAMES=['除灰','超频','魔改','成精'];
+BUILDINGS.forEach((b,i)=>{
+  TIERS.forEach((t,k)=>{
+    up('b'+i+'_'+k,b.name+' · '+TIER_NAMES[k],b.ch,b.name+'产量 ×2',b.base*t.m,'bMult',2,
+      {bIdx:i,req:s=>s.b[b.id]>=Math.ceil(t.n/2)});
+  });
+});
+
+/* —— 资料片：脚本挂机（自动点击 / 暴击 / 离线） —— */
+up('a1','按键精灵','灵','每秒自动点击 0.5 次',8e7,'autoClick',0.5,{req:s=>s.clicks>=300});
+up('a2','宏指令脚本','宏','每秒自动点击 2 次',8e9,'autoClick',2,{req:s=>s.ups['a1']});
+up('a3','云端挂机农场','云','每秒自动点击 8 次',3e11,'autoClick',8,{req:s=>s.ups['a2']});
+up('a4','AI 代肝','代','每秒自动点击 25 次',2e14,'autoClick',25,{req:s=>s.ups['a3']});
+up('x1','玄学洗脸','洗','暴击率 +5%',3e6,'critChance',0.05,{req:s=>s.clicks>=200});
+up('x2','开坛做法','坛','暴击率 +8%',4e8,'critChance',0.08,{req:s=>s.ups['x1']});
+up('x3','祖传欧气','欧','暴击率 +12%',6e10,'critChance',0.12,{req:s=>s.ups['x2']});
+up('x4','天命之子','命','暴击倍率 ×1.5',2e9,'critMul',1.5,{req:s=>s.ups['x1']});
+up('x5','橙装批发','批','暴击倍率 ×2',5e11,'critMul',2,{req:s=>s.ups['x4']});
+up('o1','断线重连','重','离线效率 +15%',2e6,'offline',0.15,{req:s=>s.ascends>=1});
+up('o2','云服务器托管','托','离线效率 +20%',5e9,'offline',0.20,{req:s=>s.ascends>=3});
+up('g8','网吧包夜卡','卡','全局产量 +60%',1e16,'gMult',0.60,{req:s=>s.lifetimeAll>=1e14});
+up('c8','祖传双击','双','点击收益 ×3',5e13,'clickMult',3,{req:s=>s.clicks>=15000});
+
+/* ============ 数据：成就 ============ */
+const ACHS=[];
+function ach(id,name,ch,desc,check){ACHS.push({id,name,ch,desc,check});}
+[['初出新手村','新',1e3],['万元户','万',1e5],['金币小霸王','霸',1e7],['一方金主','主',1e9],
+ ['名震交易所','交',1e11],['金山传说','传',1e13],['永动金币机','永',1e15]]
+ .forEach((a,i)=>ach('lt'+i,a[0],a[1],'累计搬出 '+fmt(a[2])+' 金币',s=>s.lifetimeAll>=a[2]));
+ach('ck0','手速惊人','快','累计点击 100 次',s=>s.clicks>=100);
+ach('ck1','鼠标杀手','杀','累计点击 1,000 次',s=>s.clicks>=1000);
+ach('ck2','微动终结者','终','累计点击 10,000 次',s=>s.clicks>=10000);
+BUILDINGS.forEach(b=>ach('b_'+b.id,b.name+'大户',b.ch,'同时拥有 25 个'+b.name,s=>s.b[b.id]>=25));
+ach('tot0','工作室认证','认','家当总数达到 100',s=>totalBuildings()>=100);
+ach('tot1','人间挂机王','王','家当总数达到 500',s=>totalBuildings()>=500);
+[['躺赚入门','躺',10],['时薪破千','千',1e3],['日入百万','日',1e5],['印钞机本体','钞',1e7]]
+ .forEach((a,i)=>ach('cps'+i,a[0],a[1],'每秒产量达到 '+fmt(a[2])+' 金币',s=>cps()>=a[2]));
+ach('as0','首次回村','归','第一次回村过年',s=>s.ascends>=1);
+ach('as1','年年有余','余','回村过年三次',s=>s.ascends>=3);
+ach('as2','红包收割机','红','回村过年十次',s=>s.ascends>=10);
+ach('t0','一局没打完','局','累计挂机 10 分钟',s=>s.playtime>=600);
+/* —— 资料片新增成就 —— */
+ach('au0','脚本入门','脚','脚本自动点击 500 次',s=>s.autoClicks>=500);
+ach('au1','全自动搬砖','自','脚本自动点击 5,000 次',s=>s.autoClicks>=5000);
+ach('au2','人已不在','走','脚本自动点击 50,000 次',s=>s.autoClicks>=50000);
+ach('cr0','玄学初学者','玄','手动点出 50 次暴击',s=>s.mCrits>=50);
+ach('cr1','欧皇附体','欧','手动点出 500 次暴击',s=>s.mCrits>=500);
+ach('dy0','日拱一卒','日','完成 10 个日常任务',s=>s.dailyDone>=10);
+ach('dy1','全勤大神','勤','完成 40 个日常任务',s=>s.dailyDone>=40);
+ach('dy2','七日签到','签','连续完成 7 天日常',s=>!!s.daily&&s.daily.streak>=7);
+ach('up0','神装全收','全','收集全部神装',s=>Object.keys(s.ups).length>=UPS.length);
+ach('bk0','包夜之王','夜','拥有 25 个网吧包夜',s=>s.b['netcafe']>=25);
+
+/* ============ 渡劫（里程碑挑战） ============ */
+const TRIBULATIONS=[
+  {id:'t1',name:'初入江湖',threshold:1e8,desc:'累计搬出 1 亿金币时，天道感应，降下雷劫。',timeLimit:20,clickGoal:80,reward:'全局产量 ×1.5（永久）',rewardType:'gMult',rewardVal:0.5},
+  {id:'t2',name:'金丹初成',threshold:1e11,desc:'累计搬出 1 千亿金币，天劫再临。',timeLimit:25,clickGoal:200,reward:'全局产量 ×2（永久）',rewardType:'gMult',rewardVal:1.0},
+  {id:'t3',name:'元婴渡劫',threshold:1e13,desc:'累计搬出 10 兆金币，九霄雷动。',timeLimit:30,clickGoal:500,reward:'全局产量 ×3（永久）',rewardType:'gMult',rewardVal:2.0},
+];
+let tribActive=null,tribClicks=0,tribTimer=null,tribTriggered=new Set();
+
+/* ============ 人脉 NPC ============ */
+const NPCS=[
+  {id:'boss',  ch:'板',name:'网吧老板',  desc:'包夜八小时，熟客打折。',maxFav:100,
+   perks:[{fav:30,desc:'包夜价格 -20%',type:'bDiscount',val:0.2},{fav:70,desc:'包夜价格再 -30%',type:'bDiscount',val:0.3},{fav:100,desc:'免费包夜，产量 +10%',type:'gMult',val:0.1}]},
+  {id:'noodle',ch:'面',name:'泡面摊大妈',desc:'挂逼面管饱，加蛋加肠。',maxFav:100,
+   perks:[{fav:30,desc:'伙食升级成本 -25%',type:'upDiscount',val:0.25},{fav:70,desc:'伙食升级成本再 -25%',type:'upDiscount',val:0.25},{fav:100,desc:'免费加蛋，点击收益 +15%',type:'clickMult',val:0.15}]},
+  {id:'bro',   ch:'哥',name:'隔壁老哥',  desc:'送红牛、借网线、一起搬砖。',maxFav:100,
+   perks:[{fav:30,desc:'恶搞事件增益 +30%',type:'evtMult',val:0.3},{fav:70,desc:'事件触发频率 +50%',type:'evtFreq',val:0.5},{fav:100,desc:'老哥代班，离线效率 +15%',type:'offline',val:0.15}]},
+  {id:'admin', ch:'管',name:'网管小弟',  desc:'拉网线、修主机、偶尔封号。',maxFav:100,
+   perks:[{fav:30,desc:'封号损失减半',type:'banReduce',val:0.5},{fav:70,desc:'脚本点击 +20%',type:'autoMult',val:0.2},{fav:100,desc:'网管罩着，成就加成 +10%',type:'achMult',val:0.1}]},
+];
+
+/* ============ 黑历史图鉴 ============ */
+const DARK_TEMPLATES=[
+  {id:'banned',ch:'封',name:'被封号了',desc:'因在奥山挂机被举报，封号 {n} 天'},
+  {id:'trib_fail',ch:'劫',name:'渡劫失败',desc:'天雷劈下，金币减半，道心受损'},
+  {id:'trib_pass',ch:'雷',name:'渡劫成功',desc:'扛过天劫，修为大增'},
+  {id:'lose_event',ch:'亏',name:'遭遇横祸',desc:'{name}，损失 {n} 金币'},
+  {id:'prestige',ch:'归',name:'回村过年',desc:'第 {n} 次回家，领到红包'},
+  {id:'milestone',ch:'里程碑',name:'金币突破',desc:'累计搬出 {n} 金币'},
+];
+let darkHistory=[];
+
+/* ============ 天赋树（WoW 风格三列） ============ */
+const TREES=[
+  {id:'click',name:'肝帝',ch:'肝',color:'#e6c26e',desc:'点击流：每一击都是修行'},
+  {id:'idle', name:'摸鱼',ch:'鱼',color:'#9fd8c0',desc:'挂机流：无为而治，道法自然'},
+  {id:'luck', name:'欧皇',ch:'欧',color:'#e89a8a',desc:'运气流：玄学也是实力'},
+];
+const TALENTS=[
+  /* —— 肝帝线 —— */
+  {id:'c1',tree:'click',row:1,name:'铁砂掌',desc:'点击收益 +25%',type:'clickMult',val:0.25,max:4},
+  {id:'c2',tree:'click',row:2,name:'连击心得',desc:'连击倍率上限 +1',type:'comboMax',val:1,max:3},
+  {id:'c3',tree:'click',row:3,name:'人剑合一',desc:'点击额外获得每秒产量的 3%',type:'clickCps',val:0.03,max:3},
+  {id:'c4',tree:'click',row:4,name:'肝帝觉醒',desc:'点击收益 ×2',type:'clickMult',val:1.0,max:1},
+  /* —— 摸鱼线 —— */
+  {id:'i1',tree:'idle',row:1,name:'断线重连',desc:'离线效率 +10%',type:'offline',val:0.10,max:3},
+  {id:'i2',tree:'idle',row:2,name:'云服务器',desc:'离线上限 +8 小时',type:'offlineCap',val:28800,max:2},
+  {id:'i3',tree:'idle',row:3,name:'自动脚本',desc:'脚本点击速率 +30%',type:'autoMult',val:0.30,max:3},
+  {id:'i4',tree:'idle',row:4,name:'无为而治',desc:'全局产量 +20%',type:'gMult',val:0.20,max:2},
+  /* —— 欧皇线 —— */
+  {id:'l1',tree:'luck',row:1,name:'玄学洗脸',desc:'暴击率 +4%',type:'critChance',val:0.04,max:3},
+  {id:'l2',tree:'luck',row:2,name:'天命之子',desc:'暴击倍率 +30%',type:'critMul',val:0.30,max:2},
+  {id:'l3',tree:'luck',row:3,name:'祖传欧气',desc:'恶搞事件增益持续 +25%',type:'evtDur',val:0.25,max:3},
+  {id:'l4',tree:'luck',row:4,name:'天道眷顾',desc:'全局产量 +15%',type:'gMult',val:0.15,max:2},
+];
+
+/* ============ 状态 ============ */
+const SAVE_KEY='idle-guabi-save-v1', R=1.15;
+function freshState(){return{stones:0,runLifetime:0,lifetimeAll:0,clicks:0,clickEarned:0,b:{},ups:{},ach:{},perks:{},talents:{},
+  jade:0,ascends:0,talentPoints:0,playtime:0,lastSave:Date.now(),muted:false,introSeen:false,buyMode:'1',startAt:Date.now(),
+  mCrits:0,autoClicks:0,bBought:0,upBought:0,events:0,dailyDone:0,daily:null,np:{},darkHistory:[],tribDone:{},_v:2};}
+let state=freshState();
+BUILDINGS.forEach(b=>state.b[b.id]=0);
+
+const has=id=>!!state.ups[id];
+function totalBuildings(){return BUILDINGS.reduce((a,b)=>a+state.b[b.id],0);}
+function achCount(){return Object.keys(state.ach).length;}
+function gongfaMult(){let m=1;for(const u of UPS)if(u.type==='gMult'&&has(u.id))m*=(1+u.v);return m;}
+function globalMult(){return gongfaMult()*(1+state.jade*0.02)*(1+achCount()*0.01)*talentProd('gMult')*(1+npcSum('gMult'));}
+function buildingMult(i){let m=1;for(const u of UPS)if(u.type==='bMult'&&u.bIdx===i&&has(u.id))m*=u.v;return m;}
+function cps(){
+  let s=0;
+  BUILDINGS.forEach((b,i)=>{if(state.b[b.id]>0)s+=b.cps*state.b[b.id]*buildingMult(i);});
+  return s*globalMult();
+}
+function clickCpsPct(){let p=0;for(const u of UPS)if(u.type==='clickCps'&&has(u.id))p+=u.v;p+=talentSum('clickCps');return p;}
+function clickPower(){
+  let p=1;
+  for(const u of UPS)if(u.type==='clickMult'&&has(u.id))p*=u.v;
+  p*=talentProd('clickMult');p*=(1+npcSum('clickMult'));
+  return (p+cps()*clickCpsPct())*globalMult();
+}
+/* 资料片：按类型汇总神装（加法 / 乘法） */
+function upSum(type){let v=0;for(const u of UPS)if(u.type===type&&has(u.id))v+=u.v;return v;}
+function upProd(type){let v=1;for(const u of UPS)if(u.type===type&&has(u.id))v*=u.v;return v;}
+function bCost(b,owned){return b.base*Math.pow(R,owned);}
+function bulkCost(b,owned,n){return b.base*Math.pow(R,owned)*(Math.pow(R,n)-1)/(R-1);}
+function maxAfford(b,owned,stones){
+  const g0=b.base*Math.pow(R,owned);
+  return Math.max(0,Math.floor(Math.log(1+stones*(R-1)/g0)/Math.log(R)));
+}
+function jadeGain(){return Math.floor(Math.pow(state.runLifetime/1e12,0.5));}
+function unlockedB(i){
+  const b=BUILDINGS[i];
+  if(i===0)return true;
+  return state.b[b.id]>0||state.b[BUILDINGS[i-1].id]>0||state.lifetimeAll>=b.base/2;
+}
+
+/* ============ 红包商店（永久特权） ============ */
+const PERKS=[
+  {id:'mouse',  ch:'手', name:'金刚鼠标手', desc:'点击收益 ×2',       base:5,  growth:3,   max:5},
+  {id:'crit',   ch:'续', name:'手气延续',   desc:'恶搞事件增益持续 +20%', base:8,  growth:2.5, max:3},
+  {id:'critdmg',ch:'伤', name:'暴击伤害',   desc:'暴击倍率 +50',      base:10, growth:2.5, max:4},
+  {id:'dream',  ch:'梦', name:'梦游搬砖',   desc:'离线效率 +10%',     base:6,  growth:2.5, max:4},
+  {id:'sleep',  ch:'眠', name:'闭关延长',   desc:'离线上限 +12 小时', base:4,  growth:3,   max:2},
+  {id:'luck',   ch:'运', name:'时来运转',   desc:'全局产量 +25%',     base:15, growth:2.2, max:4},
+];
+function perkLevel(id){return state.perks[id]||0;}
+function perkCost(p){return Math.ceil(p.base*Math.pow(p.growth,perkLevel(p.id)));}
+function critChance(){return Math.min(0.75,0.05+upSum('critChance')+talentSum('critChance'));}
+function critMultVal(){return (50+50*perkLevel('critdmg'))*upProd('critMul')*talentProd('critMul');}
+function autoClickRate(){return upSum('autoClick')*(1+talentSum('autoMult'))*(1+npcSum('autoMult'));}
+function offlineEff(){return Math.min(1,0.5+perkLevel('dream')*0.1+upSum('offline')+talentSum('offline')+npcSum('offline'));}
+function offlineCap(){return 86400+perkLevel('sleep')*12*3600+talentSum('offlineCap');}
+
+/* ============ 天赋树逻辑 ============ */
+function talentRank(id){return state.talents[id]||0;}
+function treePoints(treeId){let t=0;TALENTS.forEach(ta=>{if(ta.tree===treeId)t+=talentRank(ta.id);});return t;}
+function talentTierMax(row){return row===1?1:row===2?2:row===3?3:row===4?4:5;}
+function canSpendTalent(ta){
+  const rk=talentRank(ta.id);if(rk>=ta.max)return false;
+  if(state.talentPoints<1)return false;
+  const tp=treePoints(ta.tree);
+  const tierNeed=[0,1,3,6,10];
+  return tp>=tierNeed[ta.row-1];
+}
+function spendTalent(id){
+  const ta=TALENTS.find(t=>t.id===id);if(!ta||!canSpendTalent(ta))return false;
+  state.talents[id]=(state.talents[id]||0)+1;state.talentPoints--;
+  Sound.buy();updateTalentUI();updateAll();saveGame();return true;
+}
+function refundTree(treeId){
+  let refund=0;
+  TALENTS.forEach(ta=>{if(ta.tree===treeId&&state.talents[ta.id]){refund+=state.talents[ta.id];state.talents[ta.id]=0;}});
+  state.talentPoints+=refund;Sound.buy();updateTalentUI();updateAll();saveGame();
+  toast('已重置'+TREES.find(t=>t.id===treeId).name+'天赋，退回 '+refund+' 点');
+}
+/* 天赋效果汇总 */
+function talentSum(type){let v=0;TALENTS.forEach(ta=>{if(ta.type===type)v+=ta.val*talentRank(ta.id);});return v;}
+function talentProd(type){let v=1;TALENTS.forEach(ta=>{if(ta.type===type)v*=(1+ta.val*talentRank(ta.id));});return v;}
+
+/* ============ 人脉 NPC 逻辑 ============ */
+function npcFav(id){return state.np[id]||0;}
+function addNpcFav(id,amt){
+  const npc=NPCS.find(n=>n.id===id);if(!npc)return;
+  state.np[id]=Math.min(npc.maxFav,(state.np[id]||0)+amt);
+}
+function npcPerkActive(npc,perk){return npc&&perk&&npcFav(npc.id)>=perk.fav;}
+/* NPC 效果汇总 */
+function npcSum(type){let v=0;NPCS.forEach(npc=>{npc.perks.forEach(p=>{if(p.type===type&&npcPerkActive(npc,p))v+=p.val;});});return v;}
+
+/* ============ 黑历史图鉴 ============ */
+function recordDark(templateId,vars){
+  const tpl=DARK_TEMPLATES.find(t=>t.id===templateId);if(!tpl)return;
+  let desc=tpl.desc;
+  if(vars)for(const k in vars)desc=desc.replace('{'+k+'}',vars[k]);
+  const entry={id:tpl.id,ch:tpl.ch,name:tpl.name,desc:desc,time:Date.now()};
+  state.darkHistory=state.darkHistory||[];
+  state.darkHistory.unshift(entry);
+  if(state.darkHistory.length>200)state.darkHistory.length=200;
+}
+
+/* ============ 渡劫逻辑 ============ */
+function checkTribulations(){
+  TRIBULATIONS.forEach(t=>{
+    if(state.tribDone[t.id])return;
+    if(tribTriggered.has(t.id))return;
+    if(state.lifetimeAll>=t.threshold){
+      tribTriggered.add(t.id);
+      startTribulation(t);
+    }
+  });
+}
+function startTribulation(t){
+  tribActive=t;tribClicks=0;
+  const md=showModal('<div class="pv-icon flv" style="color:#ff6b4a;border-color:rgba(255,100,60,.6);background:rgba(255,80,40,.15)">劫</div>'+
+    '<h3 class="flv" style="color:#ff8a6a">'+t.name+'</h3>'+
+    '<p>'+t.desc+'</p>'+
+    '<p class="warn">在 <b class="gold" id="tribTime">'+t.timeLimit+'</b> 秒内点击 <b class="gold" id="tribClicks">0</b> / '+t.clickGoal+' 次！</p>'+
+    '<p class="warn">失败将损失 50% 金币！</p>'+
+    '<div class="btnrow"><button class="btn-danger" id="tribStart" style="font-size:18px;padding:14px 40px">开始渡劫！</button></div>',{sticky:true});
+  md.m.querySelector('#tribStart').addEventListener('click',()=>{
+    md.close();runTribulation(t);
+  });
+}
+function runTribulation(t){
+  tribActive=t;tribClicks=0;
+  let remaining=t.timeLimit;
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer';
+  overlay.innerHTML='<div style="font-size:48px;color:#ff6b4a;letter-spacing:8px;margin-bottom:20px;text-shadow:0 0 30px rgba(255,80,40,.6)">渡 劫 中</div>'+
+    '<div style="font-size:72px;color:#ffd98a;font-weight:900;font-variant-numeric:tabular-nums" id="tribBigClicks">0</div>'+
+    '<div style="font-size:18px;color:#a39a83;margin-top:8px">/ '+t.clickGoal+' 次</div>'+
+    '<div style="font-size:36px;color:#e6c26e;margin-top:20px;font-variant-numeric:tabular-nums" id="tribBigTime">'+remaining+'</div>'+
+    '<div style="font-size:14px;color:#a39a83;margin-top:8px">疯狂点击屏幕！</div>';
+  document.body.appendChild(overlay);
+  tribTimer=setInterval(()=>{
+    remaining--;
+    const te=document.getElementById('tribBigTime');if(te)te.textContent=remaining;
+    if(tribClicks>=t.clickGoal){clearInterval(tribTimer);endTribulation(t,true,overlay);return;}
+    if(remaining<=0){clearInterval(tribTimer);endTribulation(t,false,overlay);return;}
+  },1000);
+  overlay.addEventListener('click',()=>{
+    tribClicks++;
+    const ce=document.getElementById('tribBigClicks');if(ce)ce.textContent=tribClicks;
+    Sound.click(tribClicks);
+    const r=overlay.getBoundingClientRect();
+    spawnBurst(r.left+Math.random()*r.width,r.top+Math.random()*r.height,8);
+  });
+}
+function endTribulation(t,success,overlay){
+  overlay.remove();
+  if(success){
+    state.tribDone[t.id]=1;
+    recordDark('trib_pass');
+    Sound.ach();
+    showModal('<div class="pv-icon flv" style="color:#ffd98a;border-color:rgba(255,217,138,.6);background:rgba(255,217,138,.15)">成</div>'+
+      '<h3 class="flv">渡劫成功！</h3>'+
+      '<p>天雷散去，修为大增！</p>'+
+      '<p class="big">'+t.reward+'</p>'+
+      '<div class="btnrow"><button class="btn" data-close>继续修仙</button></div>',{sticky:true});
+  }else{
+    const loss=state.stones*0.5;state.stones-=loss;
+    recordDark('trib_fail');
+    Sound.deny();
+    showModal('<div class="pv-icon flv" style="color:#ff4444;border-color:rgba(255,60,40,.6);background:rgba(255,40,20,.15)">败</div>'+
+      '<h3 class="flv" style="color:#ff6b4a">渡劫失败</h3>'+
+      '<p>天雷劈下，道心受损！</p>'+
+      '<p class="warn">损失 <span class="big">'+fmt(loss)+'</span> 金币</p>'+
+      '<p>可以重新挑战（条件满足后再次触发）</p>'+
+      '<div class="btnrow"><button class="btn" data-close>咬牙重来</button></div>',{sticky:true});
+    tribTriggered.delete(t.id);
+  }
+  updateAll();saveGame();
+}
+
+
+/* ============ 随机恶搞事件 ============ */
+const EVENTS=[
+  {id:'redbull',ch:'牛',name:'隔壁老哥送红牛',desc:'产量 ×2，持续 60 秒',type:'timed',mult:2,dur:60,w:26},
+  {id:'netline',ch:'网',name:'网管拉了根新网线',desc:'产量 ×3，持续 45 秒',type:'timed',mult:3,dur:45,w:14},
+  {id:'baojuan',ch:'门',name:'宝娟突然推门',desc:'产量 -50%，持续 30 秒',type:'timed',mult:0.5,dur:30,w:26},
+  {id:'banned', ch:'封',name:'号被封了',desc:'损失 5% 金币',type:'lose',w:14},
+  {id:'pickup', ch:'钱',name:'地上捡到一百块',desc:'天降横财，金币入账',type:'gain',w:16},
+  {id:'orange', ch:'弓',name:'出了！出橙了！',desc:'产量 ×5，持续 20 秒',type:'timed',mult:5,dur:20,w:6},
+];
+let activeEvents=[],nextEventAt=Date.now()+90000+Math.random()*90000;
+function eventMult(){
+  const now=Date.now();let m=1;
+  for(const e of activeEvents)if(e.until>now)m*=e.mult;
+  return m;
+}
+function maybeEvent(){
+  const now=Date.now();
+  if(document.hidden||now<nextEventAt)return;
+  nextEventAt=now+90000+Math.random()*90000;
+  const total=EVENTS.reduce((a,e)=>a+e.w,0);
+  let r=Math.random()*total,pick=EVENTS[0];
+  for(const e of EVENTS){r-=e.w;if(r<=0){pick=e;break;}}
+  fireEvent(pick);
+}
+function fireEvent(e){
+  const now=Date.now();
+  let cls='good',line=e.desc;
+  state.events=(state.events||0)+1;
+  if(e.type==='timed'){
+    const dur=e.dur*(1+0.2*perkLevel('crit'))*(1+talentSum('evtDur'))*(1+npcSum('evtDur'));
+    activeEvents.push({id:e.id,ch:e.ch,name:e.name,mult:e.mult,until:now+dur*1000});
+    if(e.mult<1)cls='bad';
+  }else if(e.type==='lose'){
+    const loss=state.stones*0.05*(1-npcSum('banReduce'));state.stones-=loss;
+    line='损失 '+fmt(loss)+' 金币';cls='bad';
+    recordDark('banned');
+  }else if(e.type==='gain'){
+    const g=Math.max(200,cps()*45);state.stones+=g;state.runLifetime+=g;state.lifetimeAll+=g;
+    line='+ '+fmt(g)+' 金币';
+  }
+  /* NPC 好感度变化 */
+  if(e.id==='redbull')addNpcFav('bro',8);
+  if(e.id==='banned')addNpcFav('admin',-5);
+  if(e.id==='pickup')addNpcFav('noodle',5);
+  if(e.id==='netline')addNpcFav('boss',6);
+  if(e.id==='baojuan')addNpcFav('bro',3);
+  if(e.id==='orange'){addNpcFav('bro',10);addNpcFav('boss',5);}
+  showBanner(e,cls,line);
+  updateEventBanners();
+  updateCounters();updateBuildings();updateUpgrades();updateDetail();updatePrestige();
+}
+function showBanner(e,cls,line){
+  const box=document.getElementById('eventBanners');
+  while(box.children.length>2)box.firstChild.remove();
+  const el=document.createElement('div');el.className='evt '+cls;
+  el.innerHTML='<span class="ech flv">'+e.ch+'</span><div class="etxt"><b>'+e.name+'</b><i>'+line+'</i></div>';
+  box.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('show'));
+  setTimeout(()=>{el.classList.add('bye');setTimeout(()=>el.remove(),400);},5000);
+}
+function updateEventBanners(){
+  const now=Date.now();
+  activeEvents=activeEvents.filter(e=>e.until>now);
+  const wrap=document.getElementById('evtWrap');if(!wrap)return;
+  const chips=wrap.children;
+  while(chips.length>activeEvents.length)wrap.lastChild.remove();
+  activeEvents.forEach((e,i)=>{
+    const s=Math.ceil((e.until-now)/1000);
+    const cls='mchip '+(e.mult<1?'evbad':'evgood');
+    const txt=e.ch+' ×'+e.mult+' · '+s+'秒';
+    if(chips[i]){chips[i].className=cls;chips[i].textContent=txt;}
+    else{const c=document.createElement('span');c.className=cls;c.textContent=txt;wrap.appendChild(c);}
+  });
+}
+
+/* ============ 日常任务（每天 3 个） ============ */
+const DAILY_POOL=[
+  {id:'clicks',ch:'点',name:'手速训练', metric:'clicks',    goal:250,  desc:'手动点他 250 下'},
+  {id:'crits', ch:'橙',name:'出橙体质', metric:'mCrits',    goal:5,    desc:'手动点出 5 次暴击'},
+  {id:'buy',   ch:'当',name:'添置家当', metric:'bBought',   goal:40,   desc:'买入 40 个家当'},
+  {id:'up',    ch:'装',name:'神装入手', metric:'upBought',  goal:3,    desc:'入手 3 件神装'},
+  {id:'auto',  ch:'脚',name:'脚本代肝', metric:'autoClicks',goal:1500, desc:'脚本自动点击 1500 次'},
+  {id:'evt',   ch:'事',name:'恶搞连连', metric:'events',    goal:3,    desc:'遭遇 3 次恶搞事件'},
+];
+let dailyRefs=[],dailySig='';
+function dayKey(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function prevDayKey(){const d=new Date();d.setDate(d.getDate()-1);return dayKey(d);}
+function seedFrom(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pickDaily(day){
+  const pool=DAILY_POOL.filter(t=>t.id!=='auto'||autoClickRate()>0||(state.autoClicks||0)>0);
+  const arr=pool.slice(),rnd=mulberry32(seedFrom(day));
+  for(let i=arr.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));const tmp=arr[i];arr[i]=arr[j];arr[j]=tmp;}
+  return arr.slice(0,3).map(t=>t.id);
+}
+function ensureDaily(){
+  const today=dayKey();
+  if(!state.daily||state.daily.day!==today){
+    const prev=state.daily||{};
+    const streak=(prev.day===prevDayKey())?(prev.streak||0)+1:1;
+    const base={};DAILY_POOL.forEach(t=>base[t.metric]=state[t.metric]||0);
+    state.daily={day:today,streak:streak,picked:pickDaily(today),base:base,done:{},bonus:false};
+    return true;
+  }
+  if(!state.daily.base)state.daily.base={};
+  if(!state.daily.done)state.daily.done={};
+  if(!Array.isArray(state.daily.picked)||state.daily.picked.length!==3)state.daily.picked=pickDaily(state.daily.day);
+  return false;
+}
+function dailyProg(t){return Math.max(0,(state[t.metric]||0)-((state.daily.base||{})[t.metric]||0));}
+function dailySigOf(){return state.daily?(state.daily.day+'|'+state.daily.picked.join(',')):'';}
+function claimDaily(id){
+  ensureDaily();
+  const t=DAILY_POOL.find(x=>x.id===id);if(!t)return;
+  if(state.daily.done[id]||dailyProg(t)<t.goal){Sound.deny();return;}
+  state.daily.done[id]=1;state.dailyDone=(state.dailyDone||0)+1;
+  const g=Math.max(2000,cps()*240);
+  state.stones+=g;state.runLifetime+=g;state.lifetimeAll+=g;
+  Sound.buy();toast('日常完成 · '+t.name+'（+'+fmt(g)+' 金币）');
+  if(state.daily.picked.every(p=>state.daily.done[p])&&!state.daily.bonus){
+    state.daily.bonus=true;
+    let add=1;
+    if(state.daily.streak>0&&state.daily.streak%7===0)add=3;
+    state.jade+=add;
+    Sound.ach();toast('今日任务全清！红包 +'+add);
+  }
+  updateDaily();updateCounters();updatePrestige();saveGame();
+}
+function buildDaily(){
+  const w=document.getElementById('dTasks');if(!w)return;
+  w.innerHTML='';dailyRefs=[];
+  state.daily.picked.forEach(id=>{
+    const t=DAILY_POOL.find(x=>x.id===id);if(!t)return;
+    const c=document.createElement('div');c.className='dtask';
+    c.innerHTML='<div class="dt-ic flv">'+t.ch+'</div>'+
+      '<div class="dt-main"><div class="dt-name"><span>'+t.name+'</span><em class="dt-num"></em></div>'+
+      '<div class="dt-sub">'+t.desc+'</div><div class="dt-bar"><i></i></div></div>'+
+      '<button class="dt-btn">进行中</button>';
+    w.appendChild(c);
+    dailyRefs.push({t:t,card:c,num:c.querySelector('.dt-num'),bar:c.querySelector('.dt-bar i'),btn:c.querySelector('.dt-btn')});
+    c.addEventListener('click',()=>{if(c.classList.contains('claimable'))claimDaily(t.id);});
+  });
+  dailySig=dailySigOf();
+}
+function updateDaily(){
+  ensureDaily();
+  if(dailySig!==dailySigOf())buildDaily();
+  let any=false;
+  dailyRefs.forEach(r=>{
+    const p=Math.min(dailyProg(r.t),r.t.goal);
+    const done=!!state.daily.done[r.t.id];
+    const ready=!done&&p>=r.t.goal;
+    if(ready)any=true;
+    r.num.textContent=fmt(p)+' / '+fmt(r.t.goal);
+    r.bar.style.width=(p/r.t.goal*100)+'%';
+    r.card.classList.toggle('done',done);
+    r.card.classList.toggle('claimable',ready);
+    r.btn.textContent=done?'已领取':(ready?'领取':'进行中');
+  });
+  set('dStreak','当前连签 '+state.daily.streak+' 天');
+  const tab=document.getElementById('tabDaily');if(tab)tab.classList.toggle('dot',any);
+}
+
+/* ============ 音效（WebAudio 合成） ============ */
+const Sound={ctx:null,_gp:null,_gi:0,_gn:8,
+  ensure(){
+    if(!this.ctx){try{this.ctx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}
+    if(this.ctx&&this.ctx.state==='suspended'){try{this.ctx.resume();}catch(e){}}
+    if(this.ctx&&!this._gp){this._gp=[];for(let i=0;i<this._gn;i++){const g=this.ctx.createGain();g.connect(this.ctx.destination);this._gp.push(g);}}
+    return this.ctx;},
+  tone(f,dur,type,vol,when){
+    if(state.muted)return;
+    const ctx=this.ensure();if(!ctx)return;
+    if(ctx.state!=='running')return;
+    const t=ctx.currentTime+(when||0);
+    const o=ctx.createOscillator();
+    o.type=type||'sine';o.frequency.value=f;
+    const g=this._gp[this._gi%this._gn];this._gi++;
+    g.gain.cancelScheduledValues(t);
+    g.gain.setValueAtTime(vol||.08,t);
+    g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g);o.start(t);o.stop(t+dur+.05);},
+  click(cb){const sc=[523.25,587.33,659.25,783.99,880];const f=sc[Math.floor(Math.random()*sc.length)]*(1+Math.min(cb||0,30)*0.012);this.tone(Math.min(f,2100),.12,'triangle',.045);},
+  buy(){this.tone(440,.09,'sine',.07);this.tone(660,.12,'sine',.07,.07);},
+  ach(){[523.25,659.25,783.99,1046.5].forEach((f,i)=>this.tone(f,.18,'sine',.06,i*.09));},
+  ascend(){[220,330,440,660,880].forEach((f,i)=>this.tone(f,.35,'triangle',.07,i*.12));},
+  deny(){this.tone(160,.12,'square',.035);},
+  crit(){[523,784,1046,1568].forEach((f,i)=>this.tone(f,.16,'triangle',.09,i*.05));this.tone(90,.35,'square',.12);}
+};
+
+/* ============ 暴击人声：预加载池 + AudioBuffer 直发，避免每次冷启动一个 <audio> ============ */
+const Voice={
+  urls:{crit1:'crit1.mp3',crit2:'crit2.mp3'},
+  pool:{},idx:{},bufs:{},ready:false,unlocked:false,loading:false,
+  init(){
+    if(this.ready)return;this.ready=true;
+    for(const k in this.urls){
+      const list=[];
+      for(let i=0;i<3;i++){
+        let a;
+        try{a=new Audio(this.urls[k]);}catch(e){continue;}
+        a.preload='auto';a.volume=0.85;
+        try{a.load();}catch(e){}
+        list.push(a);
+      }
+      this.pool[k]=list;this.idx[k]=0;
+    }
+  },
+  /* 必须在用户手势里调一次：解锁 iOS 的播放限制，并把解码/音频管线预热 */
+  unlock(){
+    this.init();
+    const ctx=Sound.ensure();
+    if(!this.unlocked){
+      this.unlocked=true;
+      for(const k in this.pool){
+        this.pool[k].forEach(a=>{
+          try{
+            a.volume=0;
+            const p=a.play();
+            const done=()=>{try{a.pause();a.currentTime=0;a.volume=0.85;}catch(e){}};
+            if(p&&p.then)p.then(done).catch(()=>{try{a.volume=0.85;}catch(e){}});
+            else done();
+          }catch(e){}
+        });
+      }
+    }
+    if(ctx)this.loadBuffers();
+  },
+  /* http(s) 下把 mp3 解成 AudioBuffer：播放时零解码、零元素创建，延迟只剩输出缓冲 */
+  loadBuffers(){
+    const ctx=Sound.ctx;if(!ctx||this.loading)return;
+    this.loading=true;
+    for(const k in this.urls){
+      (async()=>{
+        try{
+          const r=await fetch(this.urls[k],{cache:'force-cache'});
+          if(!r.ok)throw 0;
+          const ab=await r.arrayBuffer();
+          this.bufs[k]=await ctx.decodeAudioData(ab);
+        }catch(e){/* file:// 打开时 fetch 会被拦，退回 <audio> 池 */}
+      })();
+    }
+  },
+  play(k){
+    if(state.muted)return;
+    const ctx=Sound.ctx,buf=this.bufs[k];
+    if(buf&&ctx&&ctx.state==='running'){
+      try{
+        const src=ctx.createBufferSource(),g=ctx.createGain();
+        src.buffer=buf;g.gain.value=0.85;
+        src.connect(g);g.connect(ctx.destination);
+        src.start();   /* 立刻发声，只剩输出缓冲的物理延迟 */
+        return;
+      }catch(e){}
+    }
+    if(!this.ready)this.init();
+    const list=this.pool[k];
+    if(!list||!list.length)return;
+    const a=list[this.idx[k]%list.length];this.idx[k]++;
+    try{
+      if(!a.paused)a.pause();
+      a.currentTime=0;a.volume=0.85;
+      const p=a.play();
+      if(p&&p.catch)p.catch(()=>{});
+    }catch(e){}
+  }
+};
+
+/* ============ 粒子 ============ */
+const cv=$('#particles'),cx=cv.getContext('2d');
+let parts=[];
+function resizeCv(){cv.width=innerWidth;cv.height=innerHeight;}
+let _rszT;addEventListener('resize',()=>{clearTimeout(_rszT);_rszT=setTimeout(resizeCv,120);});resizeCv();
+function spawnBurst(x,y,n){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2,sp=1+Math.random()*3;
+    parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1.6,life:1,size:1.5+Math.random()*2.5,g:.05});
+  }
+}
+function spawnAmbient(){
+  if(parts.length>140)return;
+  parts.push({x:Math.random()*cv.width,y:cv.height+10,vx:(Math.random()-.5)*.3,
+    vy:-(.4+Math.random()*.8),life:1,size:.8+Math.random()*2,g:0});
+}
+function drawParts(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  for(let i=parts.length-1;i>=0;i--){
+    const p=parts[i];
+    p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.life-=.008+(p.size>2?.004:0);
+    if(p.life<=0||p.y<-20){parts.splice(i,1);continue;}
+    cx.globalAlpha=Math.max(0,Math.min(1,p.life))*.9;
+    cx.fillStyle=p.g?'#ffd98a':'#e6c26e';
+    cx.beginPath();cx.arc(p.x,p.y,p.size,0,7);cx.fill();
+  }
+  cx.globalAlpha=1;
+}
+function floatNum(x,y,txt){
+  const el=document.createElement('div');
+  el.className='float-num';el.textContent='+'+txt;
+  el.style.left=Math.max(20,Math.min(innerWidth-80,x-12+(Math.random()*30-15)))+'px';
+  el.style.top=(y-24)+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1100);
+}
+
+/* ============ 连击 / 暴击 ============ */
+const CRIT_LINES=['出橙了！！！','橙弓+1，脚不沾地！','一百块！整整一百块！','天降挂逼神器！','金团爆炸，全服轰动！','这波血赚，老板直呼内行！','系统公告：B桶出货了！'];
+let combo=0,lastClickAt=0;
+function comboMax(){return 40+talentSum('comboMax');}
+function comboMultVal(){return 1+Math.min(Math.max(combo-1,0),comboMax())*0.05;}
+function updateCombo(){
+  const b=document.getElementById('comboBadge');
+  if(combo<5){b.classList.remove('show','hot1','hot2','hot3');return;}
+  document.getElementById('comboN').textContent='×'+comboMultVal().toFixed(2);
+  document.getElementById('comboT').textContent='连击 '+combo;
+  b.classList.remove('pop');void b.offsetWidth;b.classList.add('show','pop');
+  b.classList.toggle('hot1',combo>=10&&combo<20);
+  b.classList.toggle('hot2',combo>=20&&combo<30);
+  b.classList.toggle('hot3',combo>=30);
+}
+function playCritVoice(){
+  if(state.muted)return;
+  Voice.play(Math.random()<0.5?'crit1':'crit2');
+}
+function critFX(x,y,g){
+  playCritVoice();   /* 先出声再画特效：后面的 DOM 操作和 70 个粒子不该排在音频前面 */
+  document.body.classList.remove('shaking');void document.body.offsetWidth;document.body.classList.add('shaking');
+  const fx=document.getElementById('critfx');
+  fx.style.setProperty('--cx',x+'px');fx.style.setProperty('--cy',y+'px');
+  fx.classList.remove('go');void fx.offsetWidth;fx.classList.add('go');
+  const ring=document.getElementById('critRing');
+  ring.style.left=x+'px';ring.style.top=y+'px';
+  ring.classList.remove('go');void ring.offsetWidth;ring.classList.add('go');
+  const ct=document.getElementById('critText');
+  ct.innerHTML='<b>'+CRIT_LINES[Math.floor(Math.random()*CRIT_LINES.length)]+'</b><span>+'+fmt(g)+' 金币</span>';
+  ct.classList.remove('go');void ct.offsetWidth;ct.classList.add('go');
+  spawnBurst(x,y,70);
+  const fn=document.createElement('div');fn.className='float-num crit';fn.textContent='+'+fmt(g);
+  fn.style.left=Math.max(20,Math.min(innerWidth-140,x-60))+'px';fn.style.top=(y-60)+'px';
+  document.body.appendChild(fn);setTimeout(()=>fn.remove(),1300);
+  if(window.__crits!==undefined)window.__crits++;
+}
+
+/* ============ 存档 ============ */
+/* 旧档兼容：补齐资料片新增字段（存档键不变，老档直接能读） */
+function migrateState(){
+  ['stones','runLifetime','lifetimeAll','clicks','clickEarned','jade','ascends','playtime',
+   'mCrits','autoClicks','bBought','upBought','events','dailyDone'].forEach(k=>{
+    if(typeof state[k]!=='number'||!isFinite(state[k]))state[k]=0;
+  });
+  if(typeof state.buyMode!=='string')state.buyMode='1';
+  if(!state.ups||typeof state.ups!=='object')state.ups={};
+  if(!state.ach||typeof state.ach!=='object')state.ach={};
+  if(!state.b||typeof state.b!=='object')state.b={};
+  BUILDINGS.forEach(b=>{if(typeof state.b[b.id]!=='number'||!isFinite(state.b[b.id]))state.b[b.id]=0;});
+  if(state.daily&&(typeof state.daily!=='object'||!Array.isArray(state.daily.picked)))state.daily=null;
+  if(!state._v)state._v=0;
+  if(!state.talents||typeof state.talents!=='object')state.talents={};
+  if(typeof state.talentPoints!=='number')state.talentPoints=0;
+  if(!state.np||typeof state.np!=='object')state.np={};
+  if(!Array.isArray(state.darkHistory))state.darkHistory=[];
+  if(!state.tribDone||typeof state.tribDone!=='object')state.tribDone={};
+  ensureDaily();
+}
+function saveGame(){state.lastSave=Date.now();state._v=2;try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch(e){if(e&&e.name==='QuotaExceededError'){try{const s=Object.assign({},state);s.daily=null;localStorage.setItem(SAVE_KEY,JSON.stringify(s));}catch(e2){console.warn('存档空间不足，请导出备份');}}else console.warn('存档失败',e);}}
+function loadGame(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);if(!raw)return false;
+    const s=JSON.parse(raw);Object.assign(state,s);
+    BUILDINGS.forEach(b=>{if(typeof state.b[b.id]!=='number')state.b[b.id]=0;});
+    if(!state.perks||typeof state.perks!=='object')state.perks={};
+    if(state.perks.crit&&state.perks.crit>3)state.perks.crit=3;
+    migrateState();
+    return true;
+  }catch(e){return false;}
+}
+function exportSave(){try{return btoa(encodeURIComponent(JSON.stringify(state)));}catch(e){return '';}}
+function importSave(str){
+  try{
+    const s=JSON.parse(decodeURIComponent(atob(str.trim())));
+    if(typeof s.stones!=='number')throw 0;
+    state=freshState();Object.assign(state,s);
+    BUILDINGS.forEach(b=>{if(typeof state.b[b.id]!=='number')state.b[b.id]=0;});
+    migrateState();rebuildAll();return true;
+  }catch(e){return false;}
+}
+function hardReset(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}state=freshState();rebuildAll();}
+function offlineGain(){
+  const dt=(Date.now()-(state.lastSave||Date.now()))/1000;
+  if(dt<60)return null;
+  const eff=offlineEff(),cap=offlineCap();
+  const capped=Math.min(dt,cap);
+  const g=cps()*capped*eff;
+  if(g<1)return null;
+  return {dt:dt,capped:capped,g:g,eff:eff,cap:cap};
+}
+
+/* ============ 弹窗 / 提示 ============ */
+function showModal(html,opts){
+  const back=document.createElement('div');back.className='modal-back';
+  const m=document.createElement('div');m.className='modal';m.innerHTML=html;
+  back.appendChild(m);document.body.appendChild(back);
+  requestAnimationFrame(()=>back.classList.add('show'));
+  const close=()=>{back.classList.remove('show');setTimeout(()=>back.remove(),200);};
+  back.addEventListener('click',e=>{if(e.target===back&&!(opts&&opts.sticky))close();});
+  m.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',close));
+  return {back:back,m:m,close:close};
+}
+function toast(txt){
+  const t=document.createElement('div');t.className='toast';t.textContent=txt;
+  $('#toasts').appendChild(t);
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),300);},3500);
+}
+
+/* ============ UI：家当 ============ */
+const bRefs={};
+function buildBuildings(){
+  const list=$('#bList');list.innerHTML='';
+  BUILDINGS.forEach(b=>{
+    const card=document.createElement('div');card.className='bcard';
+    card.innerHTML='<div class="bicon flv">'+b.ch+'</div>'+
+      '<div class="binfo"><div class="bname">'+b.name+'<span class="bcount"></span></div>'+
+      '<div class="bdesc"></div><div class="bsub"></div></div>'+
+      '<div class="bbuy"><div class="bcost"></div><div class="bper"></div></div>';
+    card.addEventListener('click',()=>buyBuilding(b.id));
+    list.appendChild(card);
+    bRefs[b.id]={card:card,count:card.querySelector('.bcount'),nameEl:card.querySelector('.bname'),
+      descEl:card.querySelector('.bdesc'),sub:card.querySelector('.bsub'),
+      cost:card.querySelector('.bcost'),per:card.querySelector('.bper')};
+  });
+}
+function updateBuildings(){
+  BUILDINGS.forEach((b,i)=>{
+    const r=bRefs[b.id];if(!r)return;
+    const owned=state.b[b.id],unl=unlockedB(i);
+    r.card.style.display=unl?'':'none';
+    if(!unl)return;
+    r.nameEl.childNodes[0].nodeValue=b.name;
+    r.descEl.textContent=b.blurb;
+    r.count.textContent=owned>0?('×'+owned):'';
+    const each=b.cps*buildingMult(i)*globalMult();
+    r.sub.textContent='每个 '+fmt(each)+'/秒 · 合计 '+fmt(each*owned)+'/秒';
+    let n,cost;
+    if(state.buyMode==='max'){
+      n=maxAfford(b,owned,state.stones);
+      if(n<1){r.cost.textContent=fmt(bCost(b,owned))+' 金币';r.per.textContent='可购 0';
+        r.card.classList.remove('can');r.card.classList.add('cannot');return;}
+      cost=bulkCost(b,owned,n);r.per.textContent='可购 '+n;
+    }else{
+      n=parseInt(state.buyMode,10);cost=bulkCost(b,owned,n);r.per.textContent='持有 '+owned;
+    }
+    r.cost.textContent=fmt(cost)+' 金币';
+    const can=state.stones>=cost;
+    r.card.classList.toggle('can',can);r.card.classList.toggle('cannot',!can);
+  });
+}
+function updateUnlock(){
+  let next=-1;
+  for(let i=0;i<BUILDINGS.length;i++){if(!unlockedB(i)){next=i;break;}}
+  const row=document.getElementById('unlockRow');
+  if(next<0){row.style.display='none';return;}
+  row.style.display='';
+  const b=BUILDINGS[next];
+  set('uHint','下一件家当 · ');
+  document.getElementById('uHint').innerHTML='下一件家当 · <b>'+b.name+'</b>';
+  const need=b.base/2;
+  const p=Math.max(0,Math.min(100,state.lifetimeAll/need*100));
+  document.getElementById('uBar').style.width=p+'%';
+}
+function denyCard(id){
+  const r=bRefs[id];if(r){r.card.classList.remove('shake');void r.card.offsetWidth;r.card.classList.add('shake');}
+  Sound.deny();
+}
+function buyBuilding(id){
+  const b=BUILDINGS.find(x=>x.id===id);if(!b)return;
+  const owned=state.b[id];let n,cost;
+  if(state.buyMode==='max'){
+    n=maxAfford(b,owned,state.stones);
+    if(n<1){denyCard(id);return;}
+    cost=bulkCost(b,owned,n);
+  }else{
+    n=parseInt(state.buyMode,10);cost=bulkCost(b,owned,n);
+    if(state.stones<cost){denyCard(id);return;}
+  }
+  state.stones-=cost;state.b[id]+=n;state.bBought=(state.bBought||0)+n;
+  Sound.buy();updateCounters();updateBuildings();updateUnlock();updateDetail();
+}
+
+/* ============ UI：神装 ============ */
+let upSig='',upRefs={};
+let _vu,_vuf=0;
+function visibleUps(){
+  if(_vuf===window._fr)return _vu;_vuf=window._fr;
+  return _vu=UPS.filter(u=>!state.ups[u.id]&&(!u.req||u.req(state))).sort((a,b)=>a.cost-b.cost);
+}
+function rebuildUpgrades(){
+  const list=$('#uList');list.innerHTML='';upRefs={};
+  const vis=visibleUps(),ownedCnt=Object.keys(state.ups).length;
+  set('uOwned',ownedCnt?('已入手 '+ownedCnt+' 件'):'');
+  if(!vis.length){const e=document.createElement('div');e.className='empty';e.textContent='暂时没有可升级的神装，继续搬砖吧。';list.appendChild(e);}
+  vis.forEach(u=>{
+    const card=document.createElement('div');card.className='ucard';
+    card.innerHTML='<div class="bicon flv">'+u.ch+'</div>'+
+      '<div class="binfo"><div class="uname">'+u.name+'</div><div class="udesc">'+u.desc+'</div></div>'+
+      '<div class="ucost">'+fmt(u.cost)+' 金币</div>';
+    card.addEventListener('click',()=>buyUpgrade(u.id));
+    list.appendChild(card);
+    upRefs[u.id]={u:u,card:card};
+  });
+  upSig=vis.map(u=>u.id).join('|');
+  updateGfDot();
+}
+function updateUpgrades(){
+  const sig=visibleUps().map(u=>u.id).join('|');
+  if(sig!==upSig){rebuildUpgrades();return;}
+  for(const id in upRefs){
+    const can=state.stones>=upRefs[id].u.cost;
+    upRefs[id].card.classList.toggle('can',can);
+    upRefs[id].card.classList.toggle('cannot',!can);
+  }
+  updateGfDot();
+}
+function updateGfDot(){
+  let c=0;for(const id in upRefs)if(state.stones>=upRefs[id].u.cost)c++;
+  $('#tabGf').classList.toggle('dot',c>0);
+}
+function buyUpgrade(id){
+  const u=UPS.find(x=>x.id===id);if(!u)return;
+  if(state.ups[id]||state.stones<u.cost){Sound.deny();return;}
+  state.stones-=u.cost;state.ups[id]=1;state.upBought=(state.upBought||0)+1;
+  Sound.buy();rebuildUpgrades();updateCounters();updateDetail();
+}
+
+/* ============ UI：红包商店 ============ */
+const pRefs={};
+function buildShop(){
+  const list=document.getElementById('pList');list.innerHTML='';
+  PERKS.forEach(p=>{
+    const card=document.createElement('div');card.className='pcard';
+    card.innerHTML='<div class="bicon flv">'+p.ch+'</div>'+
+      '<div class="binfo"><div class="uname">'+p.name+'<span class="plv"></span></div><div class="udesc">'+p.desc+'</div></div>'+
+      '<div class="pcost"><span class="pnum"></span><span class="punit"> 红包</span></div>';
+    card.addEventListener('click',()=>buyPerk(p.id));
+    list.appendChild(card);
+    pRefs[p.id]={p:p,card:card,lv:card.querySelector('.plv'),num:card.querySelector('.pnum'),unit:card.querySelector('.punit')};
+  });
+}
+function updateShopAff(){
+  for(const id in pRefs){
+    const r=pRefs[id],maxed=r.p.max<=perkLevel(id),cost=perkCost(r.p),can=!maxed&&state.jade>=cost;
+    r.lv.textContent='Lv.'+perkLevel(id)+'/'+r.p.max;
+    r.num.textContent=maxed?'已满级':fmt(cost);
+    r.unit.style.display=maxed?'none':'';
+    r.card.classList.toggle('maxed',maxed);
+    r.card.classList.toggle('can',can);
+    r.card.classList.toggle('cannot',!can&&!maxed);
+  }
+  let any=false;for(const id in pRefs){const r=pRefs[id];if(r.p.max>perkLevel(id)&&state.jade>=perkCost(r.p))any=true;}
+  const tab=document.getElementById('tabShop');if(tab)tab.classList.toggle('dot',any);
+  set('perkJade','现有红包 '+state.jade);
+}
+
+/* ============ UI：天赋树 ============ */
+let talentBuilt=false;
+function buildTalentTree(){
+  const wrap=document.getElementById('talentTreeWrap');if(!wrap)return;
+  wrap.innerHTML='';
+  TREES.forEach(tree=>{
+    const col=document.createElement('div');col.className='talent-col';
+    col.innerHTML='<div class="talent-col-title" style="color:'+tree.color+';border-color:'+tree.color+'44">'+tree.ch+' '+tree.name+'</div>';
+    const treeTalents=TALENTS.filter(t=>t.tree===tree.id).sort((a,b)=>a.row-b.row);
+    treeTalents.forEach(ta=>{
+      const node=document.createElement('div');node.className='talent-node';node.dataset.id=ta.id;
+      node.innerHTML='<div class="tn-name">'+ta.name+'</div><div class="tn-desc">'+ta.desc+'</div><div class="tn-rank"></div>';
+      node.addEventListener('click',()=>{if(canSpendTalent(ta))spendTalent(ta.id);else{const rk=talentRank(ta.id);if(rk>=ta.max)return;Sound.deny();}});
+      col.appendChild(node);
+    });
+    /* 重置按钮 */
+    const resetBtn=document.createElement('button');resetBtn.className='talent-reset';resetBtn.textContent='重置'+tree.name;
+    resetBtn.addEventListener('click',()=>{
+      const tp=treePoints(tree.id);if(tp<1){Sound.deny();return;}
+      showModal('<h3 class="flv">重置'+tree.name+'天赋？</h3>'+
+        '<p>将退回 <span class="big">'+tp+'</span> 点天赋点，该树所有节点清零。</p>'+
+        '<div class="btnrow"><button class="btn" data-close>再想想</button><button class="btn-danger" id="doRefund">确认重置</button></div>',{sticky:true});
+      setTimeout(()=>{const btn=document.getElementById('doRefund');if(btn)btn.addEventListener('click',()=>{refundTree(tree.id);/* close modal */const mb=document.querySelector('.modal-back.show');if(mb)mb.querySelector('[data-close]').click();});},50);
+    });
+    col.appendChild(resetBtn);
+    wrap.appendChild(col);
+  });
+  talentBuilt=true;
+  updateTalentUI();
+}
+function updateTalentUI(){
+  set('talentPts',state.talentPoints||0);
+  const tab=document.getElementById('tabTalent');if(tab)tab.classList.toggle('dot',(state.talentPoints||0)>0);
+  TALENTS.forEach(ta=>{
+    const node=document.querySelector('.talent-node[data-id="'+ta.id+'"]');if(!node)return;
+    const rk=talentRank(ta.id);
+    const tp=treePoints(ta.tree);
+    const tierNeed=[0,1,3,6,10];
+    const canAfford=state.talentPoints>=1&&rk<ta.max;
+    const tierUnlocked=tp>=tierNeed[ta.row-1];
+    node.classList.remove('available','maxed','locked');
+    if(rk>=ta.max){node.classList.add('maxed');}
+    else if(canAfford&&tierUnlocked){node.classList.add('available');}
+    else{node.classList.add('locked');}
+    node.querySelector('.tn-rank').textContent='Lv.'+rk+'/'+ta.max+(ta.max>1?' ('+['一','二','三','四','五'][ta.row-1]+'层)':'');
+  });
+}
+
+/* ============ UI：人脉 NPC ============ */
+function buildNpcs(){
+  const list=document.getElementById('npcList');if(!list)return;
+  list.innerHTML='';
+  NPCS.forEach(npc=>{
+    const card=document.createElement('div');card.className='npc-card';
+    let perksHtml='';
+    npc.perks.forEach((p,i)=>{
+      const active=npcFav(npc.id)>=p.fav;
+      perksHtml+='<span class="npc-perk '+(active?'active':'inactive')+'">'+(active?'✓':'○')+' '+p.desc+' ('+p.fav+'好感)</span>';
+    });
+    card.innerHTML='<div class="npc-ch flv">'+npc.ch+'</div>'+
+      '<div class="npc-info"><div class="npc-name">'+npc.name+'</div>'+
+      '<div class="npc-desc">'+npc.desc+'</div>'+
+      '<div class="npc-fav-bar"><i id="npcBar_'+npc.id+'"></i></div>'+
+      '<div class="npc-fav-text" id="npcText_'+npc.id+'"></div>'+
+      '<div class="npc-perks">'+perksHtml+'</div></div>';
+    list.appendChild(card);
+  });
+}
+function updateNpcs(){
+  NPCS.forEach(npc=>{
+    const fav=npcFav(npc.id);
+    const bar=document.getElementById('npcBar_'+npc.id);
+    const txt=document.getElementById('npcText_'+npc.id);
+    if(bar)bar.style.width=(fav/npc.maxFav*100)+'%';
+    if(txt)txt.textContent='好感度 '+fav+' / '+npc.maxFav;
+  });
+  /* 更新 perk 样式 */
+  const cards=document.querySelectorAll('.npc-card');
+  cards.forEach((card,i)=>{
+    const npc=NPCS[i];if(!npc)return;
+    const perks=card.querySelectorAll('.npc-perk');
+    npc.perks.forEach((p,j)=>{
+      if(perks[j]){
+        const active=npcFav(npc.id)>=p.fav;
+        perks[j].className='npc-perk '+(active?'active':'inactive');
+      }
+    });
+  });
+}
+
+/* ============ UI：黑历史图鉴 ============ */
+function buildDarkHistory(){
+  const list=document.getElementById('dhList');if(!list)return;
+  const entries=state.darkHistory||[];
+  set('dhCount',entries.length);
+  if(!entries.length){list.innerHTML='<div class="dh-empty">还没有黑历史，继续搬砖吧。</div>';return;}
+  list.innerHTML='';
+  entries.slice(0,50).forEach(e=>{
+    const el=document.createElement('div');el.className='dh-entry';
+    el.innerHTML='<div class="dh-ch flv">'+e.ch+'</div>'+
+      '<div class="dh-info"><div class="dh-name">'+e.name+'</div>'+
+      '<div class="dh-desc">'+e.desc+'</div>'+
+      '<div class="dh-time">'+new Date(e.time).toLocaleString('zh-CN')+'</div></div>';
+    list.appendChild(el);
+  });
+}
+function buyPerk(id){
+  const p=PERKS.find(x=>x.id===id);if(!p)return;
+  const lvl=perkLevel(id);
+  if(lvl>=p.max){Sound.deny();return;}
+  const cost=perkCost(p);
+  if(state.jade<cost){Sound.deny();
+    const r=pRefs[id];if(r){r.card.classList.remove('shake');void r.card.offsetWidth;r.card.classList.add('shake');}
+    return;}
+  state.jade-=cost;state.perks[id]=lvl+1;
+  Sound.buy();updateShopAff();updateCounters();updateDetail();saveGame();
+  toast('永久特权 · '+p.name+' Lv.'+(lvl+1));
+}
+
+/* ============ UI：成就 ============ */
+const achRefs={};
+function buildAchs(){
+  const g=$('#aGrid');g.innerHTML='';
+  ACHS.forEach(a=>{
+    const c=document.createElement('div');c.className='acard';
+    c.innerHTML='<div class="aicon flv">'+a.ch+'</div><div class="aname">'+a.name+'</div><div class="adesc">'+a.desc+'</div>';
+    g.appendChild(c);achRefs[a.id]=c;
+  });
+}
+function applyAchEarned(){
+  ACHS.forEach(a=>{if(state.ach[a.id]&&achRefs[a.id])achRefs[a.id].classList.add('earned');});
+  set('achCount','已达成 '+achCount()+' / '+ACHS.length);
+}
+function checkAchs(){
+  let changed=false;
+  ACHS.forEach(a=>{
+    if(!state.ach[a.id]&&a.check(state)){
+      state.ach[a.id]=1;changed=true;
+      if(achRefs[a.id])achRefs[a.id].classList.add('earned');
+      toast('成就达成 · '+a.name+'（全局产量 +1%）');Sound.ach();
+    }
+  });
+  if(changed)set('achCount','已达成 '+achCount()+' / '+ACHS.length);
+}
+
+/* ============ UI：明细 / 过年 / 统计 ============ */
+const dRefs=[];
+function buildDetail(){
+  const w=$('#dRows');w.innerHTML='';dRefs.length=0;
+  BUILDINGS.forEach(b=>{
+    const d=document.createElement('div');d.className='drow';
+    d.innerHTML='<div class="dhead"><span>'+b.ch+' '+b.name+'<b class="dn"></b></span><span class="dv"></span></div>'+
+      '<div class="dbar"><i></i></div>';
+    w.appendChild(d);
+    dRefs.push({b:b,dn:d.querySelector('.dn'),dv:d.querySelector('.dv'),bar:d.querySelector('.dbar i'),row:d});
+  });
+}
+function updateDetail(){
+  const total=Math.max(cps(),1e-9);
+  dRefs.forEach((r,idx)=>{
+    r.row.style.display=unlockedB(idx)?'':'none';
+    const c=r.b.cps*state.b[r.b.id]*buildingMult(idx);
+    r.dn.textContent='×'+state.b[r.b.id];
+    r.dv.textContent=fmt(c)+'/秒 · '+(c>0?(c/total*100).toFixed(1):'0')+'%';
+    r.bar.style.width=Math.min(100,c/total*100)+'%';
+  });
+  set('mCps',fmt(cps())+' /秒');
+  set('mGf',mult2(gongfaMult()));
+  set('mJade',mult2(1+state.jade*0.02));
+  set('mAch',mult2(1+achCount()*0.01));
+  set('mTotal',mult2(globalMult()));
+  set('mEvent',mult2(eventMult()));
+  set('mClick',fmt(clickPower()));
+  set('mAuto',fmt(autoClickRate())+' /秒');
+  set('mCrit',Math.round(critChance()*100)+'% · ×'+fmt(critMultVal()));
+  set('mOff',Math.round(offlineEff()*100)+'% · '+Math.round(offlineCap()/3600)+'小时');
+}
+function updatePrestige(){
+  const g=jadeGain();
+  set('pvJade',state.jade);
+  set('pvBonus','+'+fmt(state.jade*2)+'%');
+  set('pvGain',g);
+  const p=Math.min(100,state.runLifetime/1e12*100);
+  $('#pvBar').style.width=p+'%';
+  set('pvText',p>=100?'票买好了，随时可以回家！':'本局已卖 '+fmt(state.runLifetime)+' / 1兆 金币');
+  const btn=$('#pvBtn');
+  btn.disabled=g<1;
+  btn.classList.toggle('ready',g>=1);
+}
+function updateStats(){
+  set('sLife',fmt(state.lifetimeAll));set('sRun',fmt(state.runLifetime));
+  set('sCps',fmt(cps()));set('sClicks',fmt(state.clicks));set('sClickEarned',fmt(state.clickEarned));
+  set('sBuilds',fmt(totalBuildings()));set('sAch',achCount()+' / '+ACHS.length);
+  set('sJade',state.jade);set('sAsc',state.ascends);
+  set('sTime',fmtTime(state.playtime));set('sRunTime',fmtTime((Date.now()-state.startAt)/1000));
+  set('sAuto',fmt(state.autoClicks||0));set('sCrit',fmt(state.mCrits||0));
+  set('sDaily',fmt(state.dailyDone||0));set('sStreak',(state.daily?state.daily.streak:1)+' 天');
+  set('sStart',new Date(state.startAt).toLocaleString('zh-CN'));
+}
+function updateCounters(){
+  set('stones',fmt(state.stones));set('cps',fmt(cps()));
+  set('cpow',fmt(clickPower()));set('jade',state.jade);set('clickGain',fmt(clickPower()));
+  const ar=autoClickRate();
+  set('autoRate',fmt(ar));document.body.classList.toggle('has-auto',ar>0);
+}
+function updateAll(){
+  updateCounters();updateBuildings();updateUpgrades();updateUnlock();
+  updatePrestige();updateStats();updateDetail();updateShopAff();updateDaily();
+  updateTalentUI();updateNpcs();
+}
+
+/* ============ 回家过年 ============ */
+function doPrestige(g){
+  g=g||jadeGain();if(g<1)return;
+  state.jade+=g;state.ascends++;state.talentPoints=(state.talentPoints||0)+1;
+  state.stones=0;state.runLifetime=0;state.clicks=0;state.clickEarned=0;
+  state.ups={};BUILDINGS.forEach(b=>state.b[b.id]=0);
+  activeEvents=[];nextEventAt=Date.now()+120000+Math.random()*90000;
+  state.startAt=Date.now();
+  recordDark('prestige',{n:state.ascends});
+  Sound.ascend();saveGame();rebuildAll();
+  showModal('<div class="pv-icon flv">岁</div><h3 class="flv">压岁钱到手</h3>'+
+    '<p>爸妈：在外面辛苦了，红包拿好，明年再回来。</p>'+
+    '<p>领到 <span class="big">'+g+'</span> 封红包 · 当前永久加成 <span class="big">+'+fmt(state.jade*2)+'%</span></p>'+
+    '<p>获得 <span class="big">1</span> 点天赋点 · 共 <span class="big">'+state.talentPoints+'</span> 点可用</p>'+
+    '<p>休整完毕，返城搬砖。</p>'+
+    '<div class="btnrow"><button class="btn" data-close>重新开工</button></div>',{sticky:true});
+}
+$('#pvBtn').addEventListener('click',()=>{
+  const g=jadeGain();if(g<1)return;
+  const md=showModal('<div class="pv-icon flv">年</div><h3 class="flv">回村过年？</h3>'+
+    '<p>这次回家可领 <span class="big">'+g+'</span> 封红包<span class="warn">（永久 +'+fmt(g*2)+'% 产量）</span>。</p>'+
+    '<p class="warn">将清零：金币、家当、神装、点击进度<br>将保留：红包、成就、总统计</p>'+
+    '<div class="btnrow"><button class="btn" data-close>再肝几天</button><button class="btn-danger" id="pvGo">回家！</button></div>',{sticky:true});
+  md.m.querySelector('#pvGo').addEventListener('click',()=>{md.close();doPrestige(g);});
+});
+
+/* ============ 设置 / 新手引导 / 离线 ============ */
+function showSettings(){
+  const md=showModal('<h3 class="flv">设置</h3>'+
+    '<p><label class="chk"><input type="checkbox" id="setMute" '+(state.muted?'checked':'')+'> 静音</label></p>'+
+    '<div class="btnrow"><button class="btn" id="setSave">立即保存</button>'+
+    '<button class="btn" id="setExport">导出存档</button>'+
+    '<button class="btn" id="setImp">导入存档</button>'+
+    '<button class="btn-danger" id="setReset">重开人生</button></div>'+
+    '<div id="setBox" style="display:none"><textarea id="setTa" spellcheck="false"></textarea>'+
+    '<div class="btnrow"><button class="btn" id="setCopy">复制</button><button class="btn" id="setDoImp">确认导入</button></div></div>'+
+    '<p style="margin-top:14px">进度每 15 秒自动保存于本浏览器。关掉网页他也在替你搬砖（效率 '+Math.round(offlineEff()*100)+'%，上限 '+Math.round(offlineCap()/3600)+' 小时）。</p>'+
+    '<div class="btnrow"><button class="btn" data-close>关闭</button></div>',{});
+  const box=md.m.querySelector('#setBox'),ta=md.m.querySelector('#setTa');
+  md.m.querySelector('#setMute').addEventListener('change',e=>{
+    state.muted=e.target.checked;$('#muteBtn').textContent=state.muted?'默':'音';});
+  md.m.querySelector('#setSave').addEventListener('click',()=>{saveGame();toast('进度已保存');});
+  md.m.querySelector('#setExport').addEventListener('click',()=>{
+    box.style.display='';ta.value=exportSave();ta.focus();ta.select();});
+  md.m.querySelector('#setImp').addEventListener('click',()=>{
+    box.style.display='';ta.value='';ta.placeholder='粘贴导出的存档代码';ta.focus();});
+  md.m.querySelector('#setCopy').addEventListener('click',()=>{
+    if(!ta.value)return;ta.select();
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(ta.value).then(()=>toast('已复制到剪贴板')).catch(()=>{document.execCommand('copy');toast('已复制');});
+      }else{document.execCommand('copy');toast('已复制');}
+    }catch(e){}
+  });
+  md.m.querySelector('#setDoImp').addEventListener('click',()=>{
+    if(importSave(ta.value)){toast('导入成功');md.close();}
+    else toast('存档代码无效');
+  });
+  md.m.querySelector('#setReset').addEventListener('click',()=>{
+    const c=showModal('<h3 class="flv">重开人生？</h3>'+
+      '<p class="warn">将清除所有进度：金币、家当、神装、红包、成就。人生重新来过，不可恢复。</p>'+
+      '<div class="btnrow"><button class="btn" data-close>再想想</button><button class="btn-danger" id="doRe">彻底重开</button></div>',{sticky:true});
+    c.m.querySelector('#doRe').addEventListener('click',()=>{
+      hardReset();toast('人生重开，从一块钱开始');c.close();md.close();});
+  });
+}
+function showIntro(){
+  state.introSeen=true;saveGame();
+  showModal('<div class="pv-icon flv" style="color:var(--gold-bright);border-color:rgba(230,194,110,.5);background:rgba(230,194,110,.1)">肝</div>'+
+    '<h3 class="flv">挂壁修仙传</h3>'+
+    '<p>世人皆道修仙难，殊不知挂壁亦是道。<br>你的兄弟，人称「逼桶」：出租房里，一台笔记本，一箱可乐，一提挂逼面。</p>'+
+    '<p><b class="gold">点他的脸开始搬砖</b> → 攒金币升级<b class="gold">神装</b> → 招兵买马开<b class="gold">工作室</b><br>→ 金币达 <b class="gold">1 兆</b> 后<b class="gold">回村过年</b>，领红包永久加强！</p>'+
+    '<p>每天来收 3 个<b class="gold">日常</b>任务，全清白拿红包；后期入手<b class="gold">脚本挂机</b>，人躺着也自动点。</p>'+
+    '<p>关掉网页他也在替你搬砖（效率 '+Math.round(offlineEff()*100)+'%，上限 '+Math.round(offlineCap()/3600)+' 小时），进度自动保存。</p>'+
+    '<div class="btnrow"><button class="btn" data-close>开始搬砖</button></div>',{sticky:true});
+}
+function showOffline(o){
+  const capH=Math.round(o.cap/3600);
+  showModal('<div class="pv-icon flv" style="color:#cbd5ec;border-color:rgba(140,160,200,.4);background:rgba(140,160,200,.1)">挂</div>'+
+    '<h3 class="flv">挂机收益</h3>'+
+    '<p>你离开了 <b class="gold">'+fmtTime(o.capped)+'</b>'+(o.dt>o.capped?'（超出 '+capH+' 小时的部分不再计入）':'')+'，电脑替你搬砖，收获：</p>'+
+    '<p class="big">+ '+fmt(o.g)+' 金币</p>'+
+    '<p>挂机收益效率 '+Math.round(o.eff*100)+'%，上限 '+capH+' 小时</p>'+
+    '<div class="btnrow"><button class="btn" data-close>收下</button></div>',{sticky:true});
+}
+
+/* ============ 主循环 ============ */
+let lastT=Date.now(),uiAcc=0,slowAcc=0,autoAcc=0;
+function doAutoClicks(n){
+  let g=n*clickPower();
+  const crit=Math.random()<critChance();
+  if(crit)g*=critMultVal();
+  state.stones+=g;state.runLifetime+=g;state.lifetimeAll+=g;
+  state.autoClicks=(state.autoClicks||0)+n;
+  const el=document.getElementById('dantian');
+  if(el&&Math.random()<0.05){
+    const r=el.getBoundingClientRect();
+    const x=r.left+r.width/2+(Math.random()*60-30),y=r.top+r.height/2+(Math.random()*40-20);
+    const fn=document.createElement('div');
+    fn.className='float-num'+(crit?' crit':'');
+    fn.textContent='+'+fmt(g);
+    fn.style.left=Math.max(20,Math.min(innerWidth-120,x))+'px';
+    fn.style.top=y+'px';
+    document.body.appendChild(fn);setTimeout(()=>fn.remove(),1100);
+  }
+}
+function loop(){
+  try{
+  const now=Date.now();
+  let dt=(now-lastT)/1000;lastT=now;
+  if(dt>90)dt=Math.min(dt,86400)*0.5;
+  window._fr=(window._fr||0)+1;
+  const inc=cps()*dt;
+  state.stones+=inc;state.runLifetime+=inc;state.lifetimeAll+=inc;state.playtime+=dt;
+  const ar=autoClickRate();
+  if(ar>0){
+    autoAcc+=ar*dt;
+    const n=Math.floor(autoAcc);
+    if(n>0){autoAcc-=n;doAutoClicks(n);}
+  }else{autoAcc=0;}
+  updateCounters();
+  uiAcc+=dt;
+  if(uiAcc>=0.2){uiAcc=0;updateBuildings();updateUpgrades();updateUnlock();updateShopAff();updateEventBanners();updateDaily();
+    if(combo>0&&Date.now()-lastClickAt>800){combo=0;updateCombo();}}
+  slowAcc+=dt;
+  if(slowAcc>=1){slowAcc=0;checkAchs();checkTribulations();updatePrestige();updateStats();updateDetail();maybeEvent();buildDarkHistory();
+    document.title='金币 '+fmt(state.stones)+' · 挂壁修仙传';}
+  if(!document.hidden){if(Math.random()<0.12)spawnAmbient();drawParts();}
+  }catch(e){console.error('[loop]',e);}
+  requestAnimationFrame(loop);
+}
+
+/* ============ 事件绑定 ============ */
+function bindStatic(){
+  /* 第一次触摸/按键时解锁音频：iOS 必须由用户手势激活，否则每次 play 都要重新唤醒，听起来就是"慢半拍" */
+  const unlockAudio=()=>{try{Voice.unlock();}catch(e){}};
+  ['pointerdown','touchstart','keydown'].forEach(ev=>addEventListener(ev,unlockAudio,{passive:true}));
+  $$('.tab').forEach(t=>t.addEventListener('click',()=>{
+    $$('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    $$('.pane').forEach(p=>p.classList.remove('active'));
+    const pane=$('#pane-'+t.dataset.tab);
+    pane.classList.add('active');
+    pane.scrollTop=0;
+    if(t.scrollIntoView)t.scrollIntoView({block:'nearest',inline:'center'});
+  }));
+  $$('.buybar button').forEach(b=>b.addEventListener('click',()=>{
+    state.buyMode=b.dataset.n;
+    $$('.buybar button').forEach(x=>x.classList.toggle('active',x===b));
+    updateBuildings();
+  }));
+  $('#muteBtn').addEventListener('click',()=>{
+    state.muted=!state.muted;$('#muteBtn').textContent=state.muted?'默':'音';});
+  $('#saveBtn').addEventListener('click',()=>{saveGame();toast('进度已保存');});
+  $('#setBtn').addEventListener('click',showSettings);
+  $('#dantian').addEventListener('click',e=>{
+    const now=Date.now();
+    combo=(now-lastClickAt<800)?combo+1:1;lastClickAt=now;
+    const isCrit=Math.random()<critChance();
+    let g=clickPower()*comboMultVal();
+    if(isCrit)g*=critMultVal();
+    state.stones+=g;state.runLifetime+=g;state.lifetimeAll+=g;state.clicks++;state.clickEarned+=g;
+    if(isCrit)state.mCrits=(state.mCrits||0)+1;
+    Sound.click(combo);
+    const btn=e.currentTarget;
+    btn.classList.add('blink');
+    clearTimeout(btn._blinkT);
+    btn._blinkT=setTimeout(()=>btn.classList.remove('blink'),170);
+    const r=e.currentTarget.getBoundingClientRect();
+    const x=e.clientX||r.left+r.width/2,y=e.clientY||r.top+r.height/2;
+    if(isCrit){critFX(x,y,g);}
+    else{spawnBurst(x,y,10);floatNum(x,y,fmt(g));}
+    updateCombo();updateCounters();
+  });
+  const QUOTES=['团长！你是我爹！','出了！出了！出橙弓了！','泡面加蛋，今天过节。',
+    '一百块~一百块！','金价又跌了，就当做慈善。','叮10个鸟德，猛猛打团日入8000！',
+    '网管续费！哦不对，这是我家电费。','今天也是稳稳搬砖的一天。','屏幕一黑，天塌了。',
+    '我抽的不是红河，是尊严。','团长！我是你爹！','爸爸~！爸爸~！爸爸~！爸爸~！爸爸~！爸爸~！'];
+  let qi=0;
+  setInterval(()=>{qi=(qi+1)%QUOTES.length;const q=$('#quote');
+    q.style.opacity=0;setTimeout(()=>{q.textContent=QUOTES[qi];q.style.opacity=1;},400);},25000);
+  setInterval(saveGame,15000);
+  addEventListener('beforeunload',saveGame);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)saveGame();});
+}
+
+/* ============ 启动 ============ */
+function rebuildAll(){
+  ensureDaily();
+  buildBuildings();buildDetail();buildAchs();applyAchEarned();
+  rebuildUpgrades();buildShop();buildDaily();buildTalentTree();buildNpcs();buildDarkHistory();updateAll();
+  $('#muteBtn').textContent=state.muted?'默':'音';
+  $$('.buybar button').forEach(x=>x.classList.toggle('active',x.dataset.n===String(state.buyMode)));
+}
+function init(){
+  Voice.init();   /* 先把两段暴击人声预加载进池子，别等第一次暴击才现建 */
+  const loaded=loadGame();
+  rebuildAll();bindStatic();
+  if(loaded){
+    const o=offlineGain();
+    if(o){state.stones+=o.g;state.runLifetime+=o.g;state.lifetimeAll+=o.g;updateAll();
+      setTimeout(()=>showOffline(o),500);}
+  }
+  if(!state.introSeen)setTimeout(showIntro,400);
+  const bi=document.getElementById('bgimg');
+  bi.addEventListener('load',()=>document.body.classList.add('has-bg'));
+  if(bi.complete&&bi.naturalWidth>0)document.body.classList.add('has-bg');
+  requestAnimationFrame(loop);
+}
+init();
+
+/* 调试接口（控制台可用） */
+window.G={get state(){return state;},fmt:fmt,cps:cps,clickPower:clickPower,
+  buyBuilding:buyBuilding,buyUpgrade:buyUpgrade,doPrestige:doPrestige,save:saveGame,
+  buyPerk:buyPerk,fireEvent:function(id){const e=EVENTS.find(x=>x.id===id);if(e)fireEvent(e);},
+  autoClickRate:autoClickRate,critChance:critChance,critMultVal:critMultVal,
+  offlineEff:offlineEff,offlineCap:offlineCap,doAutoClicks:doAutoClicks,
+  ensureDaily:ensureDaily,claimDaily:claimDaily,dailyProg:dailyProg,
+  migrate:migrateState,ACHS:ACHS,UPS:UPS,BUILDINGS:BUILDINGS,DAILY_POOL:DAILY_POOL,
+  Voice:Voice,playVoice:playCritVoice,Sound:Sound,
+  spendTalent:spendTalent,refundTree:refundTree,talentRank:talentRank,treePoints:treePoints,
+  npcFav:npcFav,addNpcFav:addNpcFav,recordDark:recordDark,
+  TRIBULATIONS:TRIBULATIONS,NPCS:NPCS,TALENTS:TALENTS,TREES:TREES,
+  checkTribulations:checkTribulations};
+</script>
+</body>
+</html>
