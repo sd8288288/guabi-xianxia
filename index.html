@@ -614,6 +614,18 @@ body.has-auto #autoChip{display:inline-flex}
 /* ============ 渡劫 ============ */
 .trib-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#ff8a6a;
   background:rgba(255,100,60,.1);border:1px solid rgba(255,100,60,.3);border-radius:999px;padding:2px 11px}
+.trib-list{margin-bottom:16px}
+.trib-row{padding:10px 12px;border-radius:12px;margin-bottom:8px;
+  border:1px solid rgba(255,100,60,.18);background:linear-gradient(180deg,rgba(255,100,60,.05),rgba(255,100,60,.015))}
+.trib-row.done{border-color:rgba(230,194,110,.35);background:linear-gradient(180deg,rgba(230,194,110,.07),rgba(230,194,110,.02))}
+.trib-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.trib-name{font-size:13px;font-weight:700;color:#ff8a6a;letter-spacing:1px}
+.trib-row.done .trib-name{color:var(--gold-bright)}
+.trib-state{font-size:11px;color:var(--muted);flex:none}
+.trib-bar{height:5px;border-radius:99px;background:rgba(255,255,255,.07);margin:8px 0 6px;overflow:hidden}
+.trib-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ff6b4a,#ffd98a);transition:width .3s}
+.trib-row.done .trib-bar i{background:linear-gradient(90deg,#e6c26e,#fff2c9)}
+.trib-num{font-size:11px;color:rgba(163,154,131,.85);font-variant-numeric:tabular-nums}
 
 /* ============ 响应式 ============ */
 /* 平板 / 手机：改成「应用外壳」布局——头部与头像区占固定高度，只有右侧面板内部滚动 */
@@ -913,6 +925,7 @@ body.has-auto #autoChip{display:inline-flex}
       </div>
       <div class="pane" id="pane-darkhistory">
         <div class="pane-title flv">黑历史图鉴</div>
+        <div class="trib-list" id="tribList"></div>
         <div class="pane-hint">每一次渡劫、封号、回家，都记录在案。共 <b id="dhCount">0</b> 条。</div>
         <div id="dhList"></div>
       </div>
@@ -925,6 +938,7 @@ body.has-auto #autoChip{display:inline-flex}
         <div class="mrow"><span class="k">点击累计收益</span><span class="v" id="sClickEarned">0</span></div>
         <div class="mrow"><span class="k">家当总数</span><span class="v" id="sBuilds">0</span></div>
         <div class="mrow"><span class="k">成就</span><span class="v" id="sAch">0 / 45</span></div>
+        <div class="mrow"><span class="k">天劫</span><span class="v" id="sTrib">0 / 3</span></div>
         <div class="mrow"><span class="k">红包</span><span class="v" id="sJade">0</span></div>
         <div class="mrow"><span class="k">回家次数</span><span class="v" id="sAsc">0</span></div>
         <div class="mrow"><span class="k">总挂机时长</span><span class="v" id="sTime">0秒</span></div>
@@ -1106,10 +1120,14 @@ ach('bk0','包夜之王','夜','拥有 25 个网吧包夜',s=>s.b['netcafe']>=25
 /* ============ 渡劫（里程碑挑战） ============ */
 const TRIBULATIONS=[
   {id:'t1',name:'初入江湖',threshold:1e8,desc:'累计搬出 1 亿金币时，天道感应，降下雷劫。',timeLimit:20,clickGoal:80,reward:'全局产量 ×1.5（永久）',rewardType:'gMult',rewardVal:0.5},
-  {id:'t2',name:'金丹初成',threshold:1e11,desc:'累计搬出 1 千亿金币，天劫再临。',timeLimit:25,clickGoal:200,reward:'全局产量 ×2（永久）',rewardType:'gMult',rewardVal:1.0},
-  {id:'t3',name:'元婴渡劫',threshold:1e13,desc:'累计搬出 10 兆金币，九霄雷动。',timeLimit:30,clickGoal:500,reward:'全局产量 ×3（永久）',rewardType:'gMult',rewardVal:2.0},
+  {id:'t2',name:'金丹初成',threshold:1e11,desc:'累计搬出 1 千亿金币，天劫再临。',timeLimit:25,clickGoal:160,reward:'全局产量 ×2（永久）',rewardType:'gMult',rewardVal:1.0},
+  {id:'t3',name:'元婴渡劫',threshold:1e13,desc:'累计搬出 10 兆金币，九霄雷动。',timeLimit:30,clickGoal:250,reward:'全局产量 ×3（永久）',rewardType:'gMult',rewardVal:2.0},
 ];
-let tribActive=null,tribClicks=0,tribTimer=null,tribTriggered=new Set();
+/* 渡劫失败后「道心未稳」的冷却：期间不再自动弹劫，给玩家喘息与攒钱的时间 */
+const TRIB_CD=90000;
+/* 脚本代肝折算上限：每秒最多替玩家点 4 下，剩下的仍得自己上 */
+const TRIB_AUTO_CAP=4;
+let tribActive=null,tribClicks=0,tribTimer=null,tribTriggered=new Set(),tribAutoAcc=0;
 
 /* ============ 飞升解锁树（跨局永久） ============ */
 const PRESTIGE_TREE=[
@@ -1229,7 +1247,7 @@ const TALENTS=[
 const SAVE_KEY='idle-guabi-save-v1', R=1.15;
 function freshState(){return{stones:0,runLifetime:0,lifetimeAll:0,clicks:0,clickEarned:0,b:{},ups:{},ach:{},perks:{},talents:{},
   jade:0,ascends:0,talentPoints:0,playtime:0,lastSave:Date.now(),muted:false,introSeen:false,buyMode:'1',startAt:Date.now(),
-  mCrits:0,autoClicks:0,bBought:0,upBought:0,events:0,dailyDone:0,daily:null,np:{},darkHistory:[],tribDone:{},
+  mCrits:0,autoClicks:0,bBought:0,upBought:0,events:0,dailyDone:0,daily:null,np:{},darkHistory:[],tribDone:{},tribCd:{},
   legacy:{bestCps:0,totalCps:0},prestigeNodes:{},npcEventsDone:{},_v:2};}
 let state=freshState();
 BUILDINGS.forEach(b=>state.b[b.id]=0);
@@ -1251,6 +1269,8 @@ function globalMult(){
   if(state.legacy&&state.legacy.bestCps>0)m*=(1+state.legacy.bestCps*legacyRate);
   /* 飞升树：天道酬勤 */
   m*=(1+prestigeSum('gMult'));
+  /* 渡劫：每过一劫永久乘一次，三劫全过 = ×1.5 × ×2 × ×3 */
+  m*=tribMult();
   return m;
 }
 function buildingMult(i){let m=1;for(const u of UPS)if(u.type==='bMult'&&u.bIdx===i&&has(u.id))m*=u.v;return m;}
@@ -1366,77 +1386,122 @@ function recordDark(templateId,vars){
 }
 
 /* ============ 渡劫逻辑 ============ */
+/* 奖励汇总：每个已渡之劫乘一次 (1+rewardVal) */
+function tribMult(){let m=1;TRIBULATIONS.forEach(t=>{if(state.tribDone[t.id])m*=(1+t.rewardVal);});return m;}
+/* 脚本代肝：自动点击速率折算成渡劫点击，开根号压平后期膨胀，封顶 4 次/秒 */
+function tribAutoPerSec(){
+  const r=autoClickRate();if(!(r>0))return 0;
+  return Math.min(TRIB_AUTO_CAP,Math.sqrt(r)*0.4);
+}
+function tribCdLeft(t){
+  const cd=(state.tribCd&&state.tribCd[t.id])||0;
+  return Math.max(0,cd-Date.now());
+}
 function checkTribulations(){
-  TRIBULATIONS.forEach(t=>{
-    if(state.tribDone[t.id])return;
-    if(tribTriggered.has(t.id))return;
+  if(tribActive){
+    if(document.getElementById('tribOverlay'))return;     /* 真在渡劫 */
+    tribActive=null;                                       /* 层被外力清掉：兜底复位，防止永久锁死 */
+  }
+  if(document.querySelector('.modal-back'))return;        /* 已有弹窗挂着，先不弹，避免三劫叠成三层 */
+  for(const t of TRIBULATIONS){
+    if(state.tribDone[t.id])continue;                     /* 已渡此劫 */
+    if(tribTriggered.has(t.id))continue;                  /* 本次会话已弹过 */
+    if(tribCdLeft(t)>0)continue;                          /* 道心未稳，冷却中 */
     if(state.lifetimeAll>=t.threshold){
       tribTriggered.add(t.id);
       startTribulation(t);
+      return;                                             /* 一次只渡一劫，串行推进 */
     }
-  });
+  }
 }
 function startTribulation(t){
-  tribActive=t;tribClicks=0;
+  tribClicks=0;tribAutoAcc=0;
+  const aps=tribAutoPerSec();
+  const need=(t.clickGoal/t.timeLimit);
   const md=showModal('<div class="pv-icon flv" style="color:#ff6b4a;border-color:rgba(255,100,60,.6);background:rgba(255,80,40,.15)">劫</div>'+
     '<h3 class="flv" style="color:#ff8a6a">'+t.name+'</h3>'+
     '<p>'+t.desc+'</p>'+
     '<p class="warn">在 <b class="gold" id="tribTime">'+t.timeLimit+'</b> 秒内点击 <b class="gold" id="tribClicks">0</b> / '+t.clickGoal+' 次！</p>'+
-    '<p class="warn">失败将损失 50% 金币！</p>'+
+    '<p class="hint">平均需要 '+need.toFixed(1)+' 次/秒'+(aps>0?'，脚本代肝每秒帮你点 '+aps.toFixed(1)+' 下':'')+'。</p>'+
+    '<p class="warn">失败将损失 50% 金币，并进入 '+Math.round(TRIB_CD/1000)+' 秒道心未稳期。</p>'+
     '<div class="btnrow"><button class="btn-danger" id="tribStart" style="font-size:18px;padding:14px 40px">开始渡劫！</button></div>',{sticky:true});
   md.m.querySelector('#tribStart').addEventListener('click',()=>{
     md.close();runTribulation(t);
   });
 }
 function runTribulation(t){
-  tribActive=t;tribClicks=0;
+  tribActive=t;tribClicks=0;tribAutoAcc=0;
   let remaining=t.timeLimit;
+  const aps=tribAutoPerSec();
   const overlay=document.createElement('div');
-  overlay.style.cssText='position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer';
+  overlay.id='tribOverlay';
+  overlay.style.cssText='position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent';
   overlay.innerHTML='<div style="font-size:48px;color:#ff6b4a;letter-spacing:8px;margin-bottom:20px;text-shadow:0 0 30px rgba(255,80,40,.6)">渡 劫 中</div>'+
     '<div style="font-size:72px;color:#ffd98a;font-weight:900;font-variant-numeric:tabular-nums" id="tribBigClicks">0</div>'+
     '<div style="font-size:18px;color:#a39a83;margin-top:8px">/ '+t.clickGoal+' 次</div>'+
     '<div style="font-size:36px;color:#e6c26e;margin-top:20px;font-variant-numeric:tabular-nums" id="tribBigTime">'+remaining+'</div>'+
-    '<div style="font-size:14px;color:#a39a83;margin-top:8px">疯狂点击屏幕！</div>';
+    '<div style="font-size:14px;color:#a39a83;margin-top:8px">疯狂点击屏幕！</div>'+
+    (aps>0?'<div style="font-size:13px;color:#7fd4a8;margin-top:10px">脚本代肝 +'+aps.toFixed(1)+' 次/秒</div>':'');
   document.body.appendChild(overlay);
+  const paintClicks=()=>{const ce=document.getElementById('tribBigClicks');if(ce)ce.textContent=tribClicks;};
+  const paintTime=()=>{const te=document.getElementById('tribBigTime');if(te)te.textContent=Math.max(0,remaining);};
   tribTimer=setInterval(()=>{
+    if(document.hidden)return;              /* 切后台 / 锁屏时冻结计时，不白送一败 */
+    const a=tribAutoPerSec();
+    if(a>0){
+      tribAutoAcc+=a;
+      const add=Math.floor(tribAutoAcc);
+      if(add>0){tribAutoAcc-=add;tribClicks+=add;paintClicks();}
+    }
     remaining--;
-    const te=document.getElementById('tribBigTime');if(te)te.textContent=remaining;
-    if(tribClicks>=t.clickGoal){clearInterval(tribTimer);endTribulation(t,true,overlay);return;}
-    if(remaining<=0){clearInterval(tribTimer);endTribulation(t,false,overlay);return;}
+    paintTime();
+    if(tribClicks>=t.clickGoal){clearInterval(tribTimer);tribTimer=null;endTribulation(t,true,overlay);return;}
+    if(remaining<=0){clearInterval(tribTimer);tribTimer=null;endTribulation(t,false,overlay);return;}
   },1000);
-  overlay.addEventListener('click',()=>{
-    tribClicks++;
-    const ce=document.getElementById('tribBigClicks');if(ce)ce.textContent=tribClicks;
+  const hit=e=>{
+    if(e.pointerType==='mouse'&&e.button>0)return;   /* 只认左键 */
+    tribClicks++;paintClicks();
     Sound.click(tribClicks);
-    const r=overlay.getBoundingClientRect();
-    spawnBurst(r.left+Math.random()*r.width,r.top+Math.random()*r.height,8);
-  });
+    if(parts.length<420){                            /* 粒子封顶，防连点掉帧 */
+      const r=overlay.getBoundingClientRect();
+      spawnBurst(r.left+Math.random()*r.width,r.top+Math.random()*r.height,8);
+    }
+  };
+  overlay.addEventListener(('onpointerdown' in window)?'pointerdown':'mousedown',hit);
 }
 function endTribulation(t,success,overlay){
-  overlay.remove();
+  if(overlay&&overlay.parentNode)overlay.remove();
+  tribActive=null;tribTimer=null;tribAutoAcc=0;
   if(success){
     state.tribDone[t.id]=1;
     recordDark('trib_pass');
     Sound.ach();
+    const total=tribMult();
     showModal('<div class="pv-icon flv" style="color:#ffd98a;border-color:rgba(255,217,138,.6);background:rgba(255,217,138,.15)">成</div>'+
       '<h3 class="flv">渡劫成功！</h3>'+
       '<p>天雷散去，修为大增！</p>'+
       '<p class="big">'+t.reward+'</p>'+
+      '<p class="gold">天劫累计加成：全局产量 ×'+(Math.round(total*100)/100)+'</p>'+
       '<div class="btnrow"><button class="btn" data-close>继续修仙</button></div>',{sticky:true});
   }else{
-    const loss=state.stones*0.5;state.stones-=loss;
+    /* 惩罚基准取「现金」与「本局累计的 5%」较大者，防止先把金币花光再裸渡劫 */
+    const floorAmt=state.runLifetime*0.05;
+    const loss=Math.max(0,Math.min(state.stones,Math.max(state.stones,floorAmt)*0.5));
+    state.stones-=loss;
+    /* 道心未稳：冷却期内不再自动弹劫，避免每秒重弹把人金币反复腰斩 */
+    if(!state.tribCd||typeof state.tribCd!=='object')state.tribCd={};
+    state.tribCd[t.id]=Date.now()+TRIB_CD;
     recordDark('trib_fail');
     Sound.deny();
     showModal('<div class="pv-icon flv" style="color:#ff4444;border-color:rgba(255,60,40,.6);background:rgba(255,40,20,.15)">败</div>'+
       '<h3 class="flv" style="color:#ff6b4a">渡劫失败</h3>'+
       '<p>天雷劈下，道心受损！</p>'+
       '<p class="warn">损失 <span class="big">'+fmt(loss)+'</span> 金币</p>'+
-      '<p>可以重新挑战（条件满足后再次触发）</p>'+
+      '<p>道心未稳，'+Math.round(TRIB_CD/1000)+' 秒后可再渡（这段时间攒点钱）。</p>'+
       '<div class="btnrow"><button class="btn" data-close>咬牙重来</button></div>',{sticky:true});
     tribTriggered.delete(t.id);
   }
-  updateAll();saveGame();
+  updateAll();buildTribList();saveGame();
 }
 
 
@@ -1835,6 +1900,7 @@ function migrateState(){
   if(!state.np||typeof state.np!=='object')state.np={};
   if(!Array.isArray(state.darkHistory))state.darkHistory=[];
   if(!state.tribDone||typeof state.tribDone!=='object')state.tribDone={};
+  if(!state.tribCd||typeof state.tribCd!=='object')state.tribCd={};
   if(!state.legacy||typeof state.legacy!=='object')state.legacy={bestCps:0,totalCps:0};
   if(!state.prestigeNodes||typeof state.prestigeNodes!=='object')state.prestigeNodes={};
   if(!state.npcEventsDone||typeof state.npcEventsDone!=='object')state.npcEventsDone={};
@@ -2196,7 +2262,29 @@ function updateNpcs(){
 }
 
 /* ============ UI：黑历史图鉴 ============ */
+function buildTribList(){
+  const box=document.getElementById('tribList');if(!box)return;
+  box.innerHTML='';
+  TRIBULATIONS.forEach(t=>{
+    const done=!!state.tribDone[t.id];
+    const pct=Math.max(0,Math.min(100,state.lifetimeAll/t.threshold*100));
+    const cd=Math.ceil(tribCdLeft(t)/1000);
+    let st;
+    if(done)st='已渡 · 产量 ×'+(Math.round((1+t.rewardVal)*100)/100);
+    else if(cd>0)st='道心未稳 '+cd+'s';
+    else if(state.lifetimeAll>=t.threshold)st='待降劫';
+    else st='修为不足';
+    const el=document.createElement('div');
+    el.className='trib-row'+(done?' done':'');
+    el.innerHTML='<div class="trib-top"><span class="trib-name">'+t.name+'</span><span class="trib-state">'+st+'</span></div>'+
+      '<div class="trib-bar"><i style="width:'+pct.toFixed(1)+'%"></i></div>'+
+      '<div class="trib-num">'+fmt(Math.min(state.lifetimeAll,t.threshold))+' / '+fmt(t.threshold)+
+      ' · '+t.timeLimit+' 秒内 '+t.clickGoal+' 次（'+(t.clickGoal/t.timeLimit).toFixed(1)+' 次/秒）</div>';
+    box.appendChild(el);
+  });
+}
 function buildDarkHistory(){
+  buildTribList();
   const list=document.getElementById('dhList');if(!list)return;
   const entries=state.darkHistory||[];
   set('dhCount',entries.length);
@@ -2346,6 +2434,7 @@ function updateStats(){
   set('sLife',fmt(state.lifetimeAll));set('sRun',fmt(state.runLifetime));
   set('sCps',fmt(cps()));set('sClicks',fmt(state.clicks));set('sClickEarned',fmt(state.clickEarned));
   set('sBuilds',fmt(totalBuildings()));set('sAch',achCount()+' / '+ACHS.length);
+  set('sTrib',TRIBULATIONS.filter(t=>state.tribDone[t.id]).length+' / '+TRIBULATIONS.length+'（×'+(Math.round(tribMult()*100)/100)+'）');
   set('sJade',state.jade);set('sAsc',state.ascends);
   set('sTime',fmtTime(state.playtime));set('sRunTime',fmtTime((Date.now()-state.startAt)/1000));
   set('sAuto',fmt(state.autoClicks||0));set('sCrit',fmt(state.mCrits||0));
@@ -2627,7 +2716,9 @@ window.G={get state(){return state;},fmt:fmt,cps:cps,clickPower:clickPower,
   npcFav:npcFav,addNpcFav:addNpcFav,recordDark:recordDark,
   unlockPrestigeNode:unlockPrestigeNode,prestigeNodeUnlocked:prestigeNodeUnlocked,prestigeSum:prestigeSum,
   PRESTIGE_TREE:PRESTIGE_TREE,TRIBULATIONS:TRIBULATIONS,NPCS:NPCS,TALENTS:TALENTS,TREES:TREES,
-  checkTribulations:checkTribulations};
+  checkTribulations:checkTribulations,tribMult:tribMult,tribAutoPerSec:tribAutoPerSec,
+  startTribulation:startTribulation,runTribulation:runTribulation,endTribulation:endTribulation,
+  TRIB_CD:TRIB_CD};
 </script>
 </body>
 </html>
