@@ -637,6 +637,8 @@ body.has-auto #autoChip{display:inline-flex}
   background:var(--gold-bright);box-shadow:0 0 6px rgba(255,217,138,.55)}
 .upd-ver{font-size:12px;color:rgba(163,154,131,.75);margin-top:8px}
 .upd-ver a{color:var(--gold-bright);text-decoration:none;border-bottom:1px dashed rgba(230,194,110,.45)}
+.upd-opt{margin-top:16px;font-size:13px;color:var(--muted)}
+.upd-opt input{flex:none}
 
 /* ============ 响应式 ============ */
 /* 平板 / 手机：改成「应用外壳」布局——头部与头像区占固定高度，只有右侧面板内部滚动 */
@@ -1256,6 +1258,11 @@ const TALENTS=[
 
 /* ============ 版本 & 更新日志 ============ */
 const CHANGELOG=[
+  {v:'1.2.0',date:'2026-11-02',title:'更新公告常驻',items:[
+    '版本公告改成每次启动都弹一次，不再只在版本号变化时提示',
+    '公告底部加了「不再提示」勾选框，勾上之后启动不再打扰',
+    '设置页可以随时重新打开更新提示，勾错了也能找回来',
+  ]},
   {v:'1.1.0',date:'2026-11-02',title:'天劫版本',items:[
     '天劫奖励终于实装：三劫全过，全局产量 ×1.5 × ×2 × ×3 = ×9（之前是空头支票）',
     '难度调平：金丹初成 200 → 160 次，元婴渡劫 500 → 250 次',
@@ -1281,7 +1288,7 @@ const SAVE_KEY='idle-guabi-save-v1', R=1.15;
 function freshState(){return{stones:0,runLifetime:0,lifetimeAll:0,clicks:0,clickEarned:0,b:{},ups:{},ach:{},perks:{},talents:{},
   jade:0,ascends:0,talentPoints:0,playtime:0,lastSave:Date.now(),muted:false,introSeen:false,buyMode:'1',startAt:Date.now(),
   mCrits:0,autoClicks:0,bBought:0,upBought:0,events:0,dailyDone:0,daily:null,np:{},darkHistory:[],tribDone:{},tribCd:{},
-  legacy:{bestCps:0,totalCps:0},prestigeNodes:{},npcEventsDone:{},seenVersion:null,_v:2};}
+  legacy:{bestCps:0,totalCps:0},prestigeNodes:{},npcEventsDone:{},seenVersion:null,updNever:false,_v:2};}
 let state=freshState();
 BUILDINGS.forEach(b=>state.b[b.id]=0);
 
@@ -1523,7 +1530,6 @@ function endTribulation(t,success,overlay){
     state.stones-=loss;
     /* 道心未稳：冷却期内不再自动弹劫，避免每秒重弹把人金币反复腰斩 */
     if(!state.tribCd||typeof state.tribCd!=='object')state.tribCd={};
-  if(typeof state.seenVersion!=='string')state.seenVersion=null;
     state.tribCd[t.id]=Date.now()+TRIB_CD;
     recordDark('trib_fail');
     Sound.deny();
@@ -1938,6 +1944,8 @@ function migrateState(){
   if(!state.legacy||typeof state.legacy!=='object')state.legacy={bestCps:0,totalCps:0};
   if(!state.prestigeNodes||typeof state.prestigeNodes!=='object')state.prestigeNodes={};
   if(!state.npcEventsDone||typeof state.npcEventsDone!=='object')state.npcEventsDone={};
+  if(typeof state.seenVersion!=='string')state.seenVersion=null;
+  if(typeof state.updNever!=='boolean')state.updNever=false;
   npcEventsDone=state.npcEventsDone;
   ensureDaily();
 }
@@ -2526,21 +2534,24 @@ function showUpdateLog(entry,auto){
     '<h3 class="flv">版本更新 v'+e.v+'</h3>'+
     '<p class="upd-date">'+e.date+(e.title?' · '+e.title:'')+'</p>'+
     '<div class="upd-list">'+e.items.map(t=>'<div class="upd-item">'+t+'</div>').join('')+'</div>'+
+    '<label class="chk upd-opt"><input type="checkbox" id="updNever"'+(state.updNever?' checked':'')+'> 不再提示</label>'+
     '<div class="btnrow"><button class="btn" data-close>'+(auto?'知道了，继续搬砖':'关闭')+'</button></div>',{sticky:true});
+  /* 勾选即时生效：哪怕不点按钮直接刷新，也记住了 */
+  const cb=md.m.querySelector('#updNever');
+  if(cb)cb.addEventListener('change',ev=>{
+    state.updNever=!!ev.target.checked;saveGame();
+    toast(state.updNever?'已关闭更新提示 · 设置里可重新开启':'已重新开启更新提示');
+  });
   const done=()=>{state.seenVersion=VERSION;saveGame();};
   md.m.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',done));
 }
-/* 启动时检查：老玩家升上来弹一次，全新档不打扰；别的弹窗开着就排队等它关 */
+/* 启动时检查：默认每次打开都弹一次，只有勾了「不再提示」才跳过；别的弹窗开着就排队等它关 */
 function checkVersionUpdate(retry){
   retry=retry||0;
+  if(state.updNever)return;
   if(document.querySelector('.modal-back')){
     if(retry<25)setTimeout(()=>checkVersionUpdate(retry+1),800);
     return;
-  }
-  const seen=state.seenVersion;
-  if(seen&&!verLess(seen,VERSION))return;
-  if(!seen&&!(state.lifetimeAll>0||state.clicks>0)){
-    state.seenVersion=VERSION;saveGame();return;
   }
   showUpdateLog(CHANGELOG[0],true);
 }
@@ -2549,6 +2560,7 @@ function checkVersionUpdate(retry){
 function showSettings(){
   const md=showModal('<h3 class="flv">设置</h3>'+
     '<p><label class="chk"><input type="checkbox" id="setMute" '+(state.muted?'checked':'')+'> 静音</label></p>'+
+    '<p><label class="chk" style="margin-top:10px"><input type="checkbox" id="setUpd" '+(state.updNever?'':'checked')+'> 每次启动显示更新提示</label></p>'+
     '<div class="btnrow"><button class="btn" id="setSave">立即保存</button>'+
     '<button class="btn" id="setExport">导出存档</button>'+
     '<button class="btn" id="setImp">导入存档</button>'+
@@ -2561,6 +2573,9 @@ function showSettings(){
   const box=md.m.querySelector('#setBox'),ta=md.m.querySelector('#setTa');
   md.m.querySelector('#setMute').addEventListener('change',e=>{
     state.muted=e.target.checked;$('#muteBtn').textContent=state.muted?'默':'音';});
+  md.m.querySelector('#setUpd').addEventListener('change',e=>{
+    state.updNever=!e.target.checked;saveGame();
+    toast(state.updNever?'已关闭，启动不再提示':'已开启，下次启动会显示更新公告');});
   md.m.querySelector('#setSave').addEventListener('click',()=>{saveGame();toast('进度已保存');});
   md.m.querySelector('#setExport').addEventListener('click',()=>{
     box.style.display='';ta.value=exportSave();ta.focus();ta.select();});
